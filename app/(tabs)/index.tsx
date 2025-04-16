@@ -1,14 +1,15 @@
-import { StyleSheet, View, Text, SafeAreaView, TextInput, Image, ActivityIndicator} from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, TextInput, Image, ActivityIndicator, Dimensions} from 'react-native';
 import { useEffect, useState } from 'react';
 import { doc, getDocs, collection } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
-
+import filter from 'lodash.filter';
 
 export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<{ id: string; category: string; description: string; image: string; name: string; price: number }[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [fullData, setFullData] = useState<{ id: string; category: string; description: string; image: string; name: string; price: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,8 +30,8 @@ export default function HomeScreen() {
           };
         });
         setData(fetchedData);
+        setFullData(fetchedData);
         setIsLoading(false);
-        console.log(fetchedData);
       } catch (err) {
         console.error('Error fetching data:', err);
         setIsLoading(false);
@@ -44,7 +45,17 @@ export default function HomeScreen() {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    console.log(query);
+    const formatterdquery = query.toLowerCase();
+    const filteredData = filter(fullData, (item) => {
+      return contains(item, formatterdquery);
+    })
+    setData(filteredData);
+  }
+  const contains = ({name, description} : {name: string; description: string}, query: string) => {
+    if (name.toLowerCase().includes(query) || description.toLowerCase().includes(query)) {
+      return true;
+    }
+    return false;
   }
 
   if (isLoading) {
@@ -85,8 +96,9 @@ export default function HomeScreen() {
           renderItem={({ item }) => (
             <View style = {styles.productCard}>
               <Image source={{ uri: item.image }} style={styles.productImage} />
-              <View>
-                <Text>{item.name}</Text>
+              <View style={styles.textContainer}>
+                <Text style={{ fontSize: 12, paddingBottom: 15 }}>{item.name}</Text>
+                <Text style={{fontSize: 10}}>${item.price}</Text>
               </View>
             </View>
           )}
@@ -98,6 +110,10 @@ export default function HomeScreen() {
   );
 }
 
+const screenWidth = Dimensions.get('window').width;
+const cardMargin = 5;
+const cardWidth = (screenWidth / 2) - (cardMargin * 3);
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -105,7 +121,7 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   searchBox: {
-    width: '90%',
+    width: '80%',
     height: 46,
     borderRadius: 10,
     backgroundColor: '#FFFFFF',
@@ -114,21 +130,26 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   productCard: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 5,
-    marginVertical: "2%",
-    marginHorizontal: "2%",
+    width: cardWidth,
+    margin: cardMargin,
+    backgroundColor: '#fff',
+    borderRadius: 5,
+    overflow: 'hidden',
+    alignItems: 'center'
   },
   productImage: {
-    width: 125,
-    height: 125,
-    borderRadius: 5,
-    marginRight: 10,
+    width: '100%',
+    height: 150,
+    resizeMode: 'cover',
   },
   productList: {
-
+    padding: cardMargin,
+    backgroundColor: '#e9f5f9',
+  },
+  textContainer: {
+    backgroundColor: '#61EDFF',
+    width: '100%',
+    padding: 5
   }
 });
+
