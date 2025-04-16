@@ -1,0 +1,35 @@
+[
+    {
+      "id": "1",
+      "name": "Red Cotton T-Shirt Uniqlo",
+      "description": "A comfortable and stylish black tee.",
+      "price": 40.00,
+      "image": "https://image.uniqlo.com/UQ/ST3/WesternCommon/imagesgoods/435461/item/goods_09_435461_3x4.jpg?width=369",
+      "category": "Clothing"
+    },
+    {
+      "id": "2",
+      "name": "Running Shoes",
+      "description": "Lightweight and durable for daily workouts.",
+      "price": 49.99,
+      "image": "https://example.com/images/shoes1.jpg",
+      "category": "Footwear"
+    },
+    {
+      "id": "3",
+      "name": "Backpack",
+      "description": "Perfect for school or travel.",
+      "price": 39.99,
+      "image": "https://example.com/images/backpack1.jpg",
+      "category": "Accessories"
+    },
+    {
+      "id": "4",
+      "name": "Smart Watch",
+      "description": "Keep track of your health and time in style.",
+      "price": 99.99,
+      "image": "https://example.com/images/smartwatch1.jpg",
+      "category": "Electronics"
+    }
+  ]
+  
