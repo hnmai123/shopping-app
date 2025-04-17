@@ -139,8 +139,8 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: '100%',
-    height: 150,
-    resizeMode: 'cover',
+    height: 100,
+    resizeMode: 'contain',
   },
   productList: {
     padding: cardMargin,
