@@ -64,7 +64,8 @@ export default function LoginScreen() {
             <Text style={styles.optionText}>Forgot password?</Text>
           </View>
           <Text style={styles.signUpText}>
-            New to Packme? <Text style={styles.signUpLink}>Sign up</Text>
+            New to Packme?  
+            <Text style={styles.signUpLink}> Sign up</Text>
           </Text>
         </View>
       </View>
