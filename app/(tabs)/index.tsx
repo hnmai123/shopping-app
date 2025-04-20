@@ -6,10 +6,12 @@ import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import filter from 'lodash.filter';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useCart } from '../../context/CartContext'; // Import the useCart hook
 
 
 export default function HomeScreen() {
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<NavigationProp<any>>();
+  const { cart, updateCart } = useCart(); // Access global cart state
 
   interface Product {
     id: string;
@@ -22,7 +24,11 @@ export default function HomeScreen() {
   };
 
   type RootStackParamList = {
-    cart: { cart: Product[]; cartCount: number };
+    cart: { 
+      cart: Product[]; 
+      cartCount: number; 
+      onCartUpdate: (newCart: Product[], newCount: number) => void;
+    };
   };
 
   const [isLoading, setIsLoading] = useState(false);
@@ -30,8 +36,6 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [fullData, setFullData] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [cart, setCart] = useState<Product[]>([]);
-  const [cartCount, setCartCount] = useState(0);
 
   useEffect(() => {
     setIsLoading(true);
@@ -101,15 +105,13 @@ export default function HomeScreen() {
   }
  
   const addtoCart = (product: Product) => {
-    setCart((previousCart: Product[]) => {
+    updateCart((previousCart: Product[]) => {
       const existingProduct = previousCart.find((item) => item.id === product.id);
       const updatedCart = existingProduct ? previousCart : [...previousCart, product];
-      setCart(updatedCart);
-      setCartCount(updatedCart.length);
-      navigation.navigate('cart', { cart: updatedCart, cartCount: updatedCart.length });
       return updatedCart;
     });
-  }
+    navigation.navigate('cart'); // Navigate to the cart screen without passing parameters
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
