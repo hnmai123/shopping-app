@@ -1,36 +1,16 @@
-import { RouteProp, useRoute, useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image } from 'react-native';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useState, useCallback } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useCart } from '../../context/CartContext'; // Import the useCart hook
 
 export default function Cart() {
-    type RootStackParamList = {
-        cart: {
-            cart: any;
-            cartCount: number;
-        };
-    };
-    const route = useRoute<RouteProp<RootStackParamList, 'cart'>>();
-    const [cartItems, setCartItems] = useState(route.params?.cart || []);
-    const [countCarts, setCartCount] = useState(route.params?.cartCount || 0);
-
-    // Refetch the cart items when the screen is focused and params change
-    useFocusEffect(
-        useCallback(() => {
-            const { cart, cartCount } = route.params || { cart: [], cartCount: 0 };
-            setCartItems(cart);
-            setCartCount(cartCount);
-        }, [route.params])
-    );
+    const { cart, cartCount, updateCart } = useCart(); // Access global cart state
 
     const deleteItem = (item: any) => {
-        console.log("Deleting item: ", item.name);
-        const updatedCart = cartItems.filter((cartItem: any) => cartItem.id !== item.id);
-        setCartItems(updatedCart);
-        setCartCount(updatedCart.length);
-    }
+        const updatedCart = cart.filter((cartItem: any) => cartItem.id !== item.id);
+        updateCart(updatedCart); // Update the global cart state
+    };
     
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
@@ -40,21 +20,21 @@ export default function Cart() {
                         <Text style={styles.editButtonText}>Edit</Text>
                     </TouchableOpacity>
                     <Text style={styles.headerText}>My Cart
-                        <Text style={{ fontSize: 12 }}> ({countCarts})</Text>
+                        <Text style={{ fontSize: 12 }}> ({cartCount})</Text>
                     </Text>
                     <TouchableOpacity style={styles.darkModeButton}>
                         <MaterialIcons name="dark-mode" size={24} color="black" />
                     </TouchableOpacity>
                 </View>
                 <View style={styles.cartContainer}>
-                    {cartItems.length === 0 ? (
+                    {cart.length === 0 ? (
                         <View style={styles.emptyCartContainer}>
                             <Text style={styles.emptyCartText}>Your cart is empty!</Text>
                             <Text style={styles.emptyCartText}>Go shopping to get more experience!</Text>
                         </View>
                     ) : (
                         <FlatList
-                            data={cartItems}
+                            data={cart}
                             keyExtractor={(item) => item.id}
                             renderItem={({ item }) => (
                                 <View style={styles.productCard}>
