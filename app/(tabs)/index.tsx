@@ -7,7 +7,7 @@ import filter from 'lodash.filter';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCart } from '../../context/CartContext'; // Import the useCart hook
-
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function HomeScreen() {
   const navigation = useNavigation<NavigationProp<any>>();
@@ -22,14 +22,10 @@ export default function HomeScreen() {
     price: number;
     seller: string;
   };
-
-  type RootStackParamList = {
-    cart: { 
-      cart: Product[]; 
-      cartCount: number; 
-      onCartUpdate: (newCart: Product[], newCount: number) => void;
-    };
-  };
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'AUD',
+  });
 
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<Product[]>([]);
@@ -103,34 +99,49 @@ export default function HomeScreen() {
       </GestureHandlerRootView>
     );
   }
- 
-  const addtoCart = (product: Product) => {
-    updateCart((previousCart: Product[]) => {
+
+  const addtoCart = (product: any) => {
+    updateCart((previousCart: any[]) => {
       const existingProduct = previousCart.find((item) => item.id === product.id);
-      const updatedCart = existingProduct ? previousCart : [...previousCart, product];
-      return updatedCart;
+      if (existingProduct) {
+        // If the product exists, increase its quantity
+        return previousCart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        // If the product does not exist, add it with quantity 1
+        return [...previousCart, { ...product, quantity: 1 }];
+      }
     });
-    navigation.navigate('cart'); // Navigate to the cart screen without passing parameters
+    navigation.navigate('cart');
   };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={styles.container}>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={24} color="black" style={{ marginRight: 10 }} />
-          <TextInput
-            placeholder="Search ..."
-            clearButtonMode="always"
-            style={styles.searchBox}
-            autoCapitalize="none"
-            autoCorrect={false}
-            value={searchQuery}
-            onChangeText={(query) => handleSearch(query)}
-          />
-          <TouchableOpacity>
-            <Ionicons name="camera-outline" size={24} color="black" />
+        <View style={styles.header}>
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={24} color="black" style={{ marginRight: 10 }} />
+            <TextInput
+              placeholder="Search ..."
+              clearButtonMode="always"
+              style={styles.searchBox}
+              autoCapitalize="none"
+              autoCorrect={false}
+              value={searchQuery}
+              onChangeText={(query) => handleSearch(query)}
+            />
+            <TouchableOpacity>
+              <Ionicons name="camera-outline" size={24} color="black" />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.darkModeButton}>
+            <MaterialIcons name="dark-mode" size={24} color="black" />
           </TouchableOpacity>
         </View>
+
         <FlatList
           data={data}
           keyExtractor={(item) => item.id}
@@ -139,7 +150,7 @@ export default function HomeScreen() {
               <Image source={{ uri: item.image }} style={styles.productImage} />
               <View style={styles.textContainer}>
                 <Text style={{ fontSize: 12, paddingBottom: 15 }}>{item.name}</Text>
-                <Text style={{ fontSize: 10 }}>${item.price}</Text>
+                <Text style={{ fontSize: 10 }}>{formatter.format(item.price)}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -172,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     height: 46,
-    marginBottom: 20,
+    marginBottom: 10,
     width: '80%',
     marginLeft: 10
   },
@@ -197,6 +208,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#61EDFF',
     width: '100%',
     padding: 5
-  }
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#61EDFF',
+  },
+  darkModeButton: {
+    height: 46, // Match the height of the search bar
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: '7%',
+    marginBottom: 10,
+  },
+
 });
 
