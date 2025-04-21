@@ -86,20 +86,27 @@ export default function Cart() {
                                 )} />
                             <View style={styles.cartSummary}>
                                 <View style={styles.cartSummaryRow}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
+                                    <MaterialCommunityIcons name="ticket-percent-outline" size={24} color="black" style ={{marginRight: 10}}/>
                                     <Text>Packme voucher</Text>
+                                    </View>
+                                    
                                     <TouchableOpacity>
                                         <Text>Select or enter code {'>'}</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.cartSummaryRow}>
+                                    <View style ={{flexDirection: 'row', alignItems: 'center', padding: 5}}>
+                                    <MaterialCommunityIcons name="wallet-membership" size={24} color="black" style ={{marginRight: 10}}/>
                                     <Text>Receivable point</Text>
-                                    <Text>{Math.round(totalAmount)}</Text>
+                                    </View>
+                                    <Text style = {{fontWeight: 'bold', fontSize: 25, marginRight: '8%'}}>{Math.round(totalAmount)}</Text>
                                 </View>
                                 <View style={styles.cartSummaryRow}>
                                     <Text>Total Amount</Text>
-                                    <Text>{formatter.format(totalAmount)}</Text>
-                                    <TouchableOpacity>
-                                        <Text>Place Order</Text>
+                                    <Text style = {{fontWeight: 'bold', fontSize: 20}}>{formatter.format(totalAmount)}</Text>
+                                    <TouchableOpacity style ={{backgroundColor: '#00B1BA', height: 45, borderRadius: 5, justifyContent: 'center', alignItems: 'center', padding: 5}}>
+                                        <Text style ={{fontWeight: 'bold', fontSize: 20, color: 'white'}}>Place Order</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -193,13 +200,14 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 40,
         width: '95%',
+        alignSelf: 'center',
     },
     cartSummaryRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
         borderBottomWidth: 1,
         borderBottomColor: '#ffffff',
         padding: 10,
+        alignItems: 'center',
     }
 });
