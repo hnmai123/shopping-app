@@ -92,7 +92,7 @@ export default function Cart() {
                                     </View>
                                     
                                     <TouchableOpacity>
-                                        <Text>Select or enter code {'>'}</Text>
+                                        <Text style={{color: '#666666'}}>Select or enter code {'>'}</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.cartSummaryRow}>
@@ -105,8 +105,8 @@ export default function Cart() {
                                 <View style={styles.cartSummaryRow}>
                                     <Text>Total Amount</Text>
                                     <Text style = {{fontWeight: 'bold', fontSize: 20}}>{formatter.format(totalAmount)}</Text>
-                                    <TouchableOpacity style ={{backgroundColor: '#00B1BA', height: 45, borderRadius: 5, justifyContent: 'center', alignItems: 'center', padding: 5}}>
-                                        <Text style ={{fontWeight: 'bold', fontSize: 20, color: 'white'}}>Place Order</Text>
+                                    <TouchableOpacity style ={{backgroundColor: '#00B1BA', height: 45, borderRadius: 5, justifyContent: 'center', alignItems: 'center', padding: 10}}>
+                                        <Text style ={{fontWeight: 'bold', fontSize: 20, color: 'white'}}>Checkout</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
