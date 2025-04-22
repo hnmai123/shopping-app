@@ -31,13 +31,13 @@ export default function CheckoutScreen() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={styles.container}>
                 <View style={styles.header}>
-                    <TouchableOpacity style={{ marginLeft: "6%" }} onPress={() => navigation.navigate('cart')}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
                         <Text style={{ fontSize: 20 }}>Cancel</Text>
                     </TouchableOpacity>
                     <Text style={{ fontWeight: 'bold', fontSize: 35 }}>Checkout
                         <Text style={{ fontSize: 12 }}> ({cartCount})</Text>
                     </Text>
-                    <TouchableOpacity style={{ marginRight: "6%" }}>
+                    <TouchableOpacity >
                         <MaterialIcons name="dark-mode" size={24} color="black" />
                     </TouchableOpacity>
                 </View>
@@ -48,10 +48,8 @@ export default function CheckoutScreen() {
                         renderItem={({ item }) => (
                             <View style={styles.productCard}>
                                 <View style={styles.cardHeader}>
-                                    <Ionicons name="storefront-outline" size={24} color="black" style={{ marginLeft: "2%" }} />
-                                    <View style={{ flex: 1, alignItems: 'center' }}>
-                                        <Text style={{ fontSize: 22 }}>{item.seller}</Text>
-                                    </View>
+                                    <Ionicons name="storefront-outline" size={24} color="black" style={{ position: 'absolute', left: "2%" }} />
+                                    <Text style={{ fontSize: 22 }}>{item.seller}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', padding: 5 }}>
                                     <Image source={{ uri: item.image }} style={styles.productImage} />
@@ -122,6 +120,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         backgroundColor: '#61EDFF',
         padding: 10,
+        paddingHorizontal: 20
     },
     cartContainer: {
         backgroundColor: '#e9f5f9',
@@ -136,9 +135,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#61EDFF',
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         padding: 5,
         borderTopLeftRadius: 5,
         borderTopRightRadius: 5,
+        position: 'relative'
     },
     productImage: {
         width: "50%",
@@ -155,8 +156,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#86eff5',
         borderRadius: 10,
         margin: 10,
-        position: 'absolute',
-        bottom: 70,
         width: '95%',
         alignSelf: 'center',
     },
