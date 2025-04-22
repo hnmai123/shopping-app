@@ -2,7 +2,7 @@ import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image } from 'r
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useCart } from '../../context/CartContext'; // Import the useCart hook
+import { useCart } from '../../../context/CartContext'; // Import the useCart hook
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 
