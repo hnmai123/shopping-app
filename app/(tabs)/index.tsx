@@ -4,13 +4,11 @@ import { doc, getDocs, collection } from 'firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import filter from 'lodash.filter';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCart } from '../../context/CartContext'; // Import the useCart hook
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function HomeScreen() {
-  const navigation = useNavigation<NavigationProp<any>>();
   const { cart, updateCart } = useCart(); // Access global cart state
 
   interface Product {
@@ -115,7 +113,6 @@ export default function HomeScreen() {
         return [...previousCart, { ...product, quantity: 1 }];
       }
     });
-    navigation.navigate('cart');
   };
 
   return (
