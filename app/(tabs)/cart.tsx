@@ -4,8 +4,16 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useCart } from '../../context/CartContext'; // Import the useCart hook
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 
 export default function Cart() {
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+
+    type RootStackParamList = {
+        cart: { cart: any, cartCount: number, totalAmount: number };
+        checkout: { cart: any, cartCount: number, totalAmount: number };
+    };
+
     const { cart, cartCount, updateCart } = useCart(); // Access global cart state
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
@@ -87,26 +95,30 @@ export default function Cart() {
                             <View style={styles.cartSummary}>
                                 <View style={styles.cartSummaryRow}>
                                     <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
-                                    <MaterialCommunityIcons name="ticket-percent-outline" size={24} color="black" style ={{marginRight: 10}}/>
-                                    <Text>Packme voucher</Text>
+                                        <MaterialCommunityIcons name="ticket-percent-outline" size={24} color="black" style={{ marginRight: 10 }} />
+                                        <Text>Packme voucher</Text>
                                     </View>
-                                    
+
                                     <TouchableOpacity>
-                                        <Text style={{color: '#666666'}}>Select or enter code {'>'}</Text>
+                                        <Text style={{ color: '#666666' }}>Select or enter code {'>'}</Text>
                                     </TouchableOpacity>
                                 </View>
                                 <View style={styles.cartSummaryRow}>
-                                    <View style ={{flexDirection: 'row', alignItems: 'center', padding: 5}}>
-                                    <MaterialCommunityIcons name="wallet-membership" size={24} color="black" style ={{marginRight: 10}}/>
-                                    <Text>Receivable point</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
+                                        <MaterialCommunityIcons name="wallet-membership" size={24} color="black" style={{ marginRight: 10 }} />
+                                        <Text>Receivable point</Text>
                                     </View>
-                                    <Text style = {{fontWeight: 'bold', fontSize: 25, marginRight: '8%'}}>{Math.round(totalAmount)}</Text>
+                                    <Text style={{ fontWeight: 'bold', fontSize: 25}}>{Math.round(totalAmount)}</Text>
                                 </View>
                                 <View style={styles.cartSummaryRow}>
                                     <Text>Total Amount</Text>
-                                    <Text style = {{fontWeight: 'bold', fontSize: 20}}>{formatter.format(totalAmount)}</Text>
-                                    <TouchableOpacity style ={{backgroundColor: '#00B1BA', height: 45, borderRadius: 5, justifyContent: 'center', alignItems: 'center', padding: 10}}>
-                                        <Text style ={{fontWeight: 'bold', fontSize: 20, color: 'white'}}>Checkout</Text>
+                                    <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{formatter.format(totalAmount)}</Text>
+                                    <TouchableOpacity
+                                        style={{ backgroundColor: '#00B1BA', height: 45, borderRadius: 5, justifyContent: 'center', alignItems: 'center', padding: 10 }}
+                                        onPress={() => navigation.navigate('checkout', { cart, cartCount, totalAmount }
+                                        )} // Pass the cart to the checkout screen
+                                    >
+                                        <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white' }}>Checkout</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
