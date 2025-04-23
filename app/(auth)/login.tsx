@@ -1,4 +1,4 @@
-import { SafeAreaView, StyleSheet, View, Text, Image, TextInput, TouchableOpacity} from 'react-native';
+import { SafeAreaView, StyleSheet, View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -9,6 +9,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleLogin = async () => {
@@ -17,24 +18,24 @@ export default function LoginScreen() {
       console.log("Login successful");
       router.replace('/(tabs)');
     }
-    catch (err: any) {
-      console.error("Login error: ", err.message);
+    catch (err) {
+      setErrorMessage("Sorry, your password or email was incorrect.");
     }
   };
 
   return (
-    <SafeAreaView style = {styles.containter}>
+    <SafeAreaView style={styles.containter}>
       <View style={styles.mainContainer}>
         <View style={styles.header}>
           <Image source={require('../../assets/images/favicon.png')} style={styles.logo} />
-          <Text style = {styles.appName}>PACKME</Text>
-          <Text style = {styles.appTarget}>All in one click</Text>
+          <Text style={styles.appName}>PACKME</Text>
+          <Text style={styles.appTarget}>Login to your account</Text>
         </View>
         <View style={styles.loginContainer}>
           <Text style={styles.welcomeBack}>Welcome back</Text>
-          <TextInput 
-            placeholder="Enter your email or username" 
-            style={styles.loginField} 
+          <TextInput
+            placeholder="Email"
+            style={styles.loginField}
             placeholderTextColor={"#999999"}
             value={email}
             autoCapitalize='none'
@@ -42,15 +43,15 @@ export default function LoginScreen() {
             onChangeText={setEmail}
           />
           <View style={styles.passwordContainer}>
-            <TextInput 
-              placeholder="Enter your password"  
+            <TextInput
+              placeholder="Password"
               placeholderTextColor={"#999999"}
               secureTextEntry={!showPassword}
               value={password}
               autoCapitalize='none'
               autoCorrect={false}
               onChangeText={setPassword}
-              style={{flex: 0.95, fontSize: 15}}
+              style={{ flex: 0.95, fontSize: 15 }}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <MaterialIcons name={!showPassword ? 'visibility-off' : 'visibility'} size={25} color="#666666" />
@@ -63,10 +64,13 @@ export default function LoginScreen() {
             <Text style={styles.optionText}>Log in via SMS</Text>
             <Text style={styles.optionText}>Forgot password?</Text>
           </View>
-          <Text style={styles.signUpText}>
-            New to Packme?  
-            <Text style={styles.signUpLink}> Sign up</Text>
-          </Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={styles.signUpText}> New to Packme?</Text>
+            <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
+              <Text style={styles.signUpLink}> Sign up</Text>
+            </TouchableOpacity>
+          </View>
+          {errorMessage ? <Text style={{color: 'red', fontSize: 14, margin: 10, width: '78%', alignSelf: 'center'}}>{errorMessage}</Text> : null}
         </View>
       </View>
     </SafeAreaView>
@@ -93,10 +97,10 @@ const styles = StyleSheet.create({
     marginBottom: 50
   },
   appTarget: {
-    fontSize: 35,
+    fontSize: 30,
     textAlign: 'center',
     color: 'black',
-    marginBottom: 100
+    marginBottom: 20
   },
   logo: {
     width: 131,
@@ -108,6 +112,8 @@ const styles = StyleSheet.create({
   loginContainer: {
     flex: 1,
     backgroundColor: '#e9f5f9',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   welcomeBack: {
     fontSize: 30,
