@@ -36,7 +36,7 @@ export default function LoginScreen() {
           <TextInput
             placeholder="Email"
             style={styles.loginField}
-            placeholderTextColor={"#999999"}
+            placeholderTextColor={"#989898"}
             value={email}
             autoCapitalize='none'
             autoCorrect={false}
@@ -45,7 +45,7 @@ export default function LoginScreen() {
           <View style={styles.passwordContainer}>
             <TextInput
               placeholder="Password"
-              placeholderTextColor={"#999999"}
+              placeholderTextColor={"#989898"}
               secureTextEntry={!showPassword}
               value={password}
               autoCapitalize='none'
@@ -62,7 +62,9 @@ export default function LoginScreen() {
           </TouchableOpacity>
           <View style={styles.optionRows}>
             <Text style={styles.optionText}>Log in via SMS</Text>
-            <Text style={styles.optionText}>Forgot password?</Text>
+            <TouchableOpacity onPress={() => router.push('/(auth)/reset_password')}>
+              <Text style={styles.optionText}>Forgot password?</Text>
+            </TouchableOpacity>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
             <Text style={styles.signUpText}> New to Packme?</Text>
@@ -70,7 +72,7 @@ export default function LoginScreen() {
               <Text style={styles.signUpLink}> Sign up</Text>
             </TouchableOpacity>
           </View>
-          {errorMessage ? <Text style={{color: 'red', fontSize: 14, margin: 10, width: '78%', alignSelf: 'center'}}>{errorMessage}</Text> : null}
+          {errorMessage ? <Text style={{ color: 'red', fontSize: 14, margin: 10, width: '78%', alignSelf: 'center' }}>{errorMessage}</Text> : null}
         </View>
       </View>
     </SafeAreaView>
