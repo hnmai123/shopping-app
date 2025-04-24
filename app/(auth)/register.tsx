@@ -16,28 +16,33 @@ export default function Register() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [emailError, setEmailError] = useState('');
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        emailRegex.test(email) || !email ? setEmailError('') : setEmailError('Invalid email format');
+        emailRegex.test(email) || !email ? setEmailError('') : setEmailError('Invalid email format!');
     }
 
     const createAccount = async () => {
         if (emailError || !email || !password || !confirmPassword) {
-            setError('Please fill in all fields correctly');
+            setError('Please fill in all fields correctly!');
             return;
         }
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
+            setError('Passwords do not match!');
             return;
         } else {
             try {
                 setError('');
                 await createUserWithEmailAndPassword(auth, email, password);
-                navigation.goBack();
+                setSuccessMessage('Account created successfully, please sign in!');
+                setTimeout(() => {
+                    navigation.goBack();
+                }, 1000);
             } catch (error) {
                 console.error("Error creating account:", error);
                 setError('Error creating account. Please try again.');
+                setSuccessMessage('');
             }
         }
     }
@@ -46,9 +51,9 @@ export default function Register() {
             <SafeAreaView style={{ flex: 1, backgroundColor: '#e9f5f9' }}>
                 <View style={styles.header}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={{ fontSize: 22 }}>Cancel</Text>
+                        <Text style={{ fontSize: 20 }}>Cancel</Text>
                     </TouchableOpacity>
-                    <Text style={{ fontWeight: "bold", fontSize: 40 }}>Register</Text>
+                    <Text style={{ fontWeight: "bold", fontSize: 35 }}>Register</Text>
                     <TouchableOpacity>
                         <MaterialIcons name="dark-mode" size={24} color="black" />
                     </TouchableOpacity>
@@ -63,7 +68,7 @@ export default function Register() {
                         <TextInput
                             placeholder="Email"
                             style={styles.loginField}
-                            placeholderTextColor={"#999999"}
+                            placeholderTextColor={"#989898"}
                             value={email}
                             autoCapitalize='none'
                             autoCorrect={false}
@@ -78,7 +83,7 @@ export default function Register() {
                         <View style={styles.passwordContainer}>
                             <TextInput
                                 placeholder="Password"
-                                placeholderTextColor={"#999999"}
+                                placeholderTextColor={"#989898"}
                                 secureTextEntry={!showPassword}
                                 value={password}
                                 autoCapitalize='none'
@@ -93,7 +98,7 @@ export default function Register() {
                         <View style={styles.passwordContainer}>
                             <TextInput
                                 placeholder="Confirm Password"
-                                placeholderTextColor={"#999999"}
+                                placeholderTextColor={"#989898"}
                                 secureTextEntry={!showConfirmPassword}
                                 value={confirmPassword}
                                 autoCapitalize='none'
@@ -113,11 +118,15 @@ export default function Register() {
                             <TouchableOpacity onPress={() => navigation.goBack()}>
                                 <Text style={{ color: '#00B1BA' }}> Log in</Text>
                             </TouchableOpacity>
-
                         </View>
                         {error ? (
                             <View style={styles.errorContainer}>
                                 <Text style={styles.errorText}>{error}</Text>
+                            </View>
+                        ) : null}
+                        {successMessage ? (
+                            <View style={styles.errorContainer}>
+                                <Text style={[styles.errorText, {color: 'green'}]}>{successMessage}</Text>
                             </View>
                         ) : null}
                     </View>
@@ -178,15 +187,16 @@ const styles = StyleSheet.create({
     },
     errorContainer: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
     },
     errorText: {
         color: 'red',
-        fontSize: 14,
+        fontSize: 12,
         width: '78%',
         textAlign: 'center',
-    },
+        marginVertical: 10,
+        fontWeight: 'bold',
+    }
 })
 
 
