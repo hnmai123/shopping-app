@@ -3,7 +3,7 @@ import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image } from "r
 import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-
+import React from 'react';
 
 export default function CheckoutScreen() {
     type RootStackParamList = {
