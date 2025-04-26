@@ -6,6 +6,7 @@ import { useNavigation } from "expo-router";
 import { useState } from "react";
 import { auth } from "../../firebase/firebaseConfig";
 import { sendPasswordResetEmail } from "firebase/auth";
+import React from "react";
 
 export default function ResetPasswordScreen() {
     const navigation = useNavigation();

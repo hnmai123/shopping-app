@@ -5,6 +5,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useCart } from '../../../context/CartContext'; // Import the useCart hook
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
+import React from 'react';
 
 export default function Cart() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();

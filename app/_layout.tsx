@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import { useState } from 'react';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { CartProvider } from '../context/CartContext'; // Import the CartProvider
+import React from 'react';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();

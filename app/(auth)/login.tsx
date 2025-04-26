@@ -4,6 +4,7 @@ import { useState } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { auth } from '../../firebase/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import React from 'react';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
