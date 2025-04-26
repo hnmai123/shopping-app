@@ -7,6 +7,7 @@ import filter from 'lodash.filter';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCart } from '../../context/CartContext'; // Import the useCart hook
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import React from 'react';
 
 export default function HomeScreen() {
   const { cart, updateCart } = useCart(); // Access global cart state
