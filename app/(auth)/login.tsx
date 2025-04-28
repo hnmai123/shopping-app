@@ -5,6 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { auth } from '../../firebase/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React from 'react';
+import { useTheme } from '../Context/ThemeContext'; // Add this import
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
+  const { theme, toggleTheme, isDarkMode } = useTheme(); // Get theme values
 
   const handleLogin = async () => {
     try {
@@ -24,53 +26,94 @@ export default function LoginScreen() {
     }
   };
 
+  // Add dark mode styles
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
+    },
+    header: {
+      backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF',
+      padding: "6%",
+    },
+    text: {
+      color: isDarkMode ? '#FFFFFF' : 'black',
+    },
+    input: {
+      backgroundColor: isDarkMode ? '#383838' : '#86eff5',
+      color: isDarkMode ? '#FFFFFF' : 'black',
+    },
+    loginContainer: {
+      backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
+    },
+    placeholderText: {
+      color: isDarkMode ? '#989898' : '#989898',
+    },
+  });
+
   return (
-    <SafeAreaView style={styles.containter}>
+    <SafeAreaView style={[styles.containter, dynamicStyles.container]}>
       <View style={styles.mainContainer}>
-        <View style={styles.header}>
+        <View style={[styles.header, dynamicStyles.header]}>
           <Image source={require('../../assets/images/favicon.png')} style={styles.logo} />
-          <Text style={styles.appName}>PACKME</Text>
-          <Text style={styles.appTarget}>Login to your account</Text>
+          <Text style={[styles.appName, dynamicStyles.text]}>PACKME</Text>
+          <Text style={[styles.appTarget, dynamicStyles.text]}>Login to your account</Text>
+          
+          {/* Add the theme toggle button (moon/sun icon) */}
+          <TouchableOpacity 
+            style={{ position: 'absolute', right: 20, top: 20 }}
+            onPress={toggleTheme}
+          >
+            <MaterialIcons 
+              name={isDarkMode ? 'wb-sunny' : 'brightness-3'} 
+              size={25} 
+              color={isDarkMode ? '#FFD700' : '#000'} 
+            />
+          </TouchableOpacity>
         </View>
-        <View style={styles.loginContainer}>
-          <Text style={styles.welcomeBack}>Welcome back</Text>
+        <View style={[styles.loginContainer, dynamicStyles.loginContainer]}>
+          <Text style={[styles.welcomeBack, dynamicStyles.text]}>Welcome back</Text>
           <TextInput
             placeholder="Email"
-            style={styles.loginField}
-            placeholderTextColor={"#989898"}
+            style={[styles.loginField, dynamicStyles.input]}
+            placeholderTextColor={dynamicStyles.placeholderText.color}
             value={email}
             autoCapitalize='none'
             autoCorrect={false}
             onChangeText={setEmail}
           />
-          <View style={styles.passwordContainer}>
+          <View style={[styles.passwordContainer, dynamicStyles.input]}>
             <TextInput
               placeholder="Password"
-              placeholderTextColor={"#989898"}
+              placeholderTextColor={dynamicStyles.placeholderText.color}
               secureTextEntry={!showPassword}
               value={password}
               autoCapitalize='none'
               autoCorrect={false}
               onChangeText={setPassword}
-              style={{ flex: 0.95, fontSize: 15 }}
+              style={{ flex: 0.95, fontSize: 15, color: dynamicStyles.text.color }}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <MaterialIcons name={!showPassword ? 'visibility-off' : 'visibility'} size={25} color="#666666" />
+              <MaterialIcons 
+                name={!showPassword ? 'visibility-off' : 'visibility'} 
+                size={25} 
+                color={isDarkMode ? '#FFFFFF' : '#666666'} 
+              />
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
             <Text style={styles.loginButtonText}>Log in</Text>
           </TouchableOpacity>
           <View style={styles.optionRows}>
-            <Text style={styles.optionText}>Log in via SMS</Text>
+            <Text style={[styles.optionText, dynamicStyles.text]}>Log in via SMS</Text>
             <TouchableOpacity onPress={() => router.push('/(auth)/reset_password')}>
-              <Text style={styles.optionText}>Forgot password?</Text>
+              <Text style={[styles.optionText, {color: isDarkMode ? '#61EDFF' : '#00B1BA'}]}>Forgot password?</Text>
             </TouchableOpacity>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-            <Text style={styles.signUpText}> New to Packme?</Text>
+            <Text style={[styles.signUpText, dynamicStyles.text]}> New to Packme?</Text>
             <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-              <Text style={styles.signUpLink}> Sign up</Text>
+              <Text style={[styles.signUpLink, {color: isDarkMode ? '#61EDFF' : '#00B1BA'}]}> Sign up</Text>
             </TouchableOpacity>
           </View>
           {errorMessage ? <Text style={{ color: 'red', fontSize: 14, margin: 10, width: '78%', alignSelf: 'center' }}>{errorMessage}</Text> : null}
@@ -80,29 +123,26 @@ export default function LoginScreen() {
   );
 }
 
+// Keep your original styles as they were
 const styles = StyleSheet.create({
   containter: {
     flex: 1,
-    backgroundColor: '#e9f5f9',
   },
   mainContainer: {
     flex: 1,
   },
   header: {
-    backgroundColor: '#61EDFF',
     padding: "6%",
   },
   appName: {
     fontSize: 50,
     fontWeight: 'bold',
-    color: 'black',
     textAlign: 'center',
     marginBottom: 50
   },
   appTarget: {
     fontSize: 30,
     textAlign: 'center',
-    color: 'black',
     marginBottom: 20
   },
   logo: {
@@ -114,20 +154,17 @@ const styles = StyleSheet.create({
   },
   loginContainer: {
     flex: 1,
-    backgroundColor: '#e9f5f9',
     justifyContent: 'center',
     alignItems: 'center',
   },
   welcomeBack: {
     fontSize: 30,
     fontWeight: 'bold',
-    color: 'black',
     textAlign: 'center',
     marginTop: 20,
     marginBottom: 20
   },
   loginField: {
-    backgroundColor: '#86eff5',
     borderRadius: 10,
     width: '78%',
     marginBottom: 10,
@@ -140,7 +177,6 @@ const styles = StyleSheet.create({
     width: '78%',
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#86eff5',
     height: 45,
     borderRadius: 10,
     alignSelf: 'center',
@@ -169,17 +205,14 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 10,
-    color: '#808080',
     padding: 5,
     marginBottom: 5
   },
   signUpText: {
     fontSize: 12,
-    color: '#808080',
     textAlign: 'center',
   },
   signUpLink: {
     fontSize: 12,
-    color: '#00B1BA',
   }
 });
