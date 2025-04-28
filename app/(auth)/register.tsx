@@ -7,6 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../../firebase/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React from "react";
+import { useTheme } from "../Context/ThemeContext";
 
 export default function Register() {
     const navigation = useNavigation();
@@ -18,6 +19,7 @@ export default function Register() {
     const [emailError, setEmailError] = useState('');
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const { theme, toggleTheme, isDarkMode } = useTheme();
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -47,29 +49,62 @@ export default function Register() {
             }
         }
     }
+
+    const dynamicStyles = StyleSheet.create({
+        container: {
+            backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
+        },
+        header: {
+            backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF',
+        },
+        text: {
+            color: isDarkMode ? '#FFFFFF' : 'black',
+        },
+        secondaryText: {
+            color: isDarkMode ? '#BBBBBB' : '#808080',
+        },
+        accentText: {
+            color: isDarkMode ? '#61EDFF' : '#00B1BA',
+        },
+        input: {
+            backgroundColor: isDarkMode ? '#383838' : '#86eff5',
+            color: isDarkMode ? '#FFFFFF' : 'black',
+        },
+        button: {
+            backgroundColor: isDarkMode ? '#00B1BA' : '#00B1BA',
+        },
+        icon: {
+            color: isDarkMode ? '#FFFFFF' : '#666666',
+        }
+    });
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaView style={{ flex: 1, backgroundColor: '#e9f5f9' }}>
-                <View style={styles.header}>
+            <SafeAreaView style={[dynamicStyles.container, { flex: 1 }]}>
+                <View style={[styles.header, dynamicStyles.header]}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={{ fontSize: 20 }}>Cancel</Text>
+                        <Text style={[dynamicStyles.text, { fontSize: 20 }]}>Cancel</Text>
                     </TouchableOpacity>
-                    <Text style={{ fontWeight: "bold", fontSize: 35 }}>Register</Text>
-                    <TouchableOpacity>
-                        <MaterialIcons name="dark-mode" size={24} color="black" />
+                    <Text style={[dynamicStyles.text, { fontWeight: "bold", fontSize: 35 }]}>Register</Text>
+                    <TouchableOpacity onPress={toggleTheme}>
+                        <MaterialIcons 
+                            name={isDarkMode ? 'wb-sunny' : 'dark-mode'} 
+                            size={24} 
+                            color={isDarkMode ? '#FFD700' : 'black'} 
+                        />
                     </TouchableOpacity>
                 </View>
                 <View style={{ flex: 1 }}>
                     <View style={styles.logoArea}>
                         <Image source={require('../../assets/images/favicon.png')} style={{ width: 131, height: 131, marginBottom: 10 }} />
-                        <Text style={{ fontWeight: 'bold', fontSize: 40, marginBottom: 10 }}>PACKME</Text>
-                        <Text style={{ fontSize: 30, marginBottom: 20 }}>Create your account</Text>
+                        <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 40, marginBottom: 10 }]}>PACKME</Text>
+                        <Text style={[dynamicStyles.text, { fontSize: 30, marginBottom: 20 }]}>Create your account</Text>
                     </View>
-                    <View style={styles.loginContainer}>
+                    <View style={[styles.loginContainer, dynamicStyles.container]}>
                         <TextInput
                             placeholder="Email"
-                            style={styles.loginField}
-                            placeholderTextColor={"#989898"}
+                            style={[styles.loginField, dynamicStyles.input]}
+                            placeholderTextColor="#989898"
                             value={email}
                             autoCapitalize='none'
                             autoCorrect={false}
@@ -81,43 +116,51 @@ export default function Register() {
 
                         {emailError ? <Text style={{ color: 'red', fontSize: 14, marginBottom: 10, width: '78%', alignSelf: 'center', marginLeft: 10 }}>{emailError}</Text> : null}
 
-                        <View style={styles.passwordContainer}>
+                        <View style={[styles.passwordContainer, dynamicStyles.input]}>
                             <TextInput
                                 placeholder="Password"
-                                placeholderTextColor={"#989898"}
+                                placeholderTextColor="#989898"
                                 secureTextEntry={!showPassword}
                                 value={password}
                                 autoCapitalize='none'
                                 autoCorrect={false}
                                 onChangeText={setPassword}
-                                style={{ flex: 0.95, fontSize: 15 }}
+                                style={{ flex: 0.95, fontSize: 15, color: dynamicStyles.text.color }}
                             />
                             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                                <MaterialIcons name={!showPassword ? 'visibility-off' : 'visibility'} size={25} color="#666666" />
+                                <MaterialIcons 
+                                    name={!showPassword ? 'visibility-off' : 'visibility'} 
+                                    size={25} 
+                                    color={dynamicStyles.icon.color} 
+                                />
                             </TouchableOpacity>
                         </View>
-                        <View style={styles.passwordContainer}>
+                        <View style={[styles.passwordContainer, dynamicStyles.input]}>
                             <TextInput
                                 placeholder="Confirm Password"
-                                placeholderTextColor={"#989898"}
+                                placeholderTextColor="#989898"
                                 secureTextEntry={!showConfirmPassword}
                                 value={confirmPassword}
                                 autoCapitalize='none'
                                 autoCorrect={false}
                                 onChangeText={setConfirmPassword}
-                                style={{ flex: 0.95, fontSize: 15 }}
+                                style={{ flex: 0.95, fontSize: 15, color: dynamicStyles.text.color }}
                             />
                             <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                                <MaterialIcons name={!showConfirmPassword ? 'visibility-off' : 'visibility'} size={25} color="#666666" />
+                                <MaterialIcons 
+                                    name={!showConfirmPassword ? 'visibility-off' : 'visibility'} 
+                                    size={25} 
+                                    color={dynamicStyles.icon.color} 
+                                />
                             </TouchableOpacity>
                         </View>
-                        <TouchableOpacity style={styles.signUpButton} onPress={createAccount}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 20, textAlign: 'center' }}>Register</Text>
+                        <TouchableOpacity style={[styles.signUpButton, dynamicStyles.button]} onPress={createAccount}>
+                            <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20, textAlign: 'center' }]}>Register</Text>
                         </TouchableOpacity>
                         <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 10 }}>
-                            <Text style={{ color: '#808080' }}>Already have an account?</Text>
+                            <Text style={dynamicStyles.secondaryText}>Already have an account?</Text>
                             <TouchableOpacity onPress={() => navigation.goBack()}>
-                                <Text style={{ color: '#00B1BA' }}> Log in</Text>
+                                <Text style={dynamicStyles.accentText}> Log in</Text>
                             </TouchableOpacity>
                         </View>
                         {error ? (
@@ -132,7 +175,6 @@ export default function Register() {
                         ) : null}
                     </View>
                 </View>
-
             </SafeAreaView>
         </GestureHandlerRootView>
     )
@@ -144,7 +186,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 5,
-        backgroundColor: '#61EDFF',
         padding: 10,
         paddingHorizontal: 20
     },
@@ -155,10 +196,8 @@ const styles = StyleSheet.create({
     },
     loginContainer: {
         flex: 1,
-        backgroundColor: '#e9f5f9',
     },
     loginField: {
-        backgroundColor: '#86eff5',
         borderRadius: 10,
         width: '78%',
         marginBottom: 10,
@@ -171,7 +210,6 @@ const styles = StyleSheet.create({
         width: '78%',
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#86eff5',
         height: 45,
         borderRadius: 10,
         alignSelf: 'center',
@@ -180,7 +218,6 @@ const styles = StyleSheet.create({
     },
     signUpButton: {
         width: '78%',
-        backgroundColor: '#00B1BA',
         height: 45,
         borderRadius: 10,
         alignSelf: 'center',
@@ -199,7 +236,3 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     }
 })
-
-
-
-
