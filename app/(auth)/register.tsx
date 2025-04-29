@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../../firebase/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React from "react";
-import { useTheme } from "../Context/ThemeContext";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Register() {
     const navigation = useNavigation();
