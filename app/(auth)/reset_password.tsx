@@ -7,6 +7,7 @@ import { useState } from "react";
 import { auth } from "../../firebase/firebaseConfig";
 import { sendPasswordResetEmail } from "firebase/auth";
 import React from "react";
+import { useTheme } from "../Context/ThemeContext";
 
 export default function ResetPasswordScreen() {
     const navigation = useNavigation();
@@ -14,6 +15,7 @@ export default function ResetPasswordScreen() {
     const [emailError, setEmailError] = useState('');
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
+    const { theme, toggleTheme, isDarkMode } = useTheme();
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -38,30 +40,59 @@ export default function ResetPasswordScreen() {
         }
     }
 
+    const dynamicStyles = StyleSheet.create({
+        container: {
+            backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
+        },
+        header: {
+            backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF',
+        },
+        text: {
+            color: isDarkMode ? '#FFFFFF' : 'black',
+        },
+        secondaryText: {
+            color: isDarkMode ? '#BBBBBB' : '#989898',
+        },
+        input: {
+            backgroundColor: isDarkMode ? '#383838' : '#86eff5',
+            color: isDarkMode ? '#FFFFFF' : 'black',
+        },
+        button: {
+            backgroundColor: isDarkMode ? '#00B1BA' : '#00B1BA',
+        },
+        icon: {
+            color: isDarkMode ? '#FFFFFF' : '#666666',
+        }
+    });
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaView style={{ flex: 1, backgroundColor: '#e9f5f9' }}>
-                <View style={styles.header}>
+            <SafeAreaView style={[dynamicStyles.container, { flex: 1 }]}>
+                <View style={[styles.header, dynamicStyles.header]}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={{ fontSize: 20 }}>Cancel</Text>
+                        <Text style={[dynamicStyles.text, { fontSize: 20 }]}>Cancel</Text>
                     </TouchableOpacity>
-                    <Text style={{ fontWeight: "bold", fontSize: 25 }}>Forgot Password</Text>
-                    <TouchableOpacity>
-                        <MaterialIcons name="dark-mode" size={24} color="black" />
+                    <Text style={[dynamicStyles.text, { fontWeight: "bold", fontSize: 25 }]}>Forgot Password</Text>
+                    <TouchableOpacity onPress={toggleTheme}>
+                        <MaterialIcons 
+                            name={isDarkMode ? 'wb-sunny' : 'dark-mode'} 
+                            size={24} 
+                            color={isDarkMode ? '#FFD700' : 'black'} 
+                        />
                     </TouchableOpacity>
                 </View>
                 <View style={{ flex: 1 }}>
                     <View style={{ flex: 1, alignSelf: 'center', width: '90%' }}>
-                        <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 10 }}>Reset password</Text>
-                        <Text style={{ color: '#989898', fontSize: 14, marginVertical: 5 }}>Please enter your email to reset the password</Text>
+                        <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20, marginVertical: 10 }]}>Reset password</Text>
+                        <Text style={[dynamicStyles.secondaryText, { fontSize: 14, marginVertical: 5 }]}>Please enter your email to reset the password</Text>
 
                         <View style={{ flex: 1 }}>
-                            <Text style={{ fontWeight: 'bold', marginVertical: 5, fontSize: 15 }}>Email</Text>
+                            <Text style={[dynamicStyles.text, { fontWeight: 'bold', marginVertical: 5, fontSize: 15 }]}>Email</Text>
 
                             <TextInput
                                 placeholder="Email"
-                                style={styles.emailField}
-                                placeholderTextColor={'#989898'}
+                                style={[styles.emailField, dynamicStyles.input]}
+                                placeholderTextColor={dynamicStyles.secondaryText.color}
                                 autoCapitalize="none"
                                 autoCorrect={false}
                                 value={email}
@@ -71,8 +102,8 @@ export default function ResetPasswordScreen() {
                                 }}
                             />
                             {emailError ? <Text style={{ color: 'red', fontSize: 14, marginBottom: 10, width: '100%' }}>{emailError}</Text> : null}
-                            <TouchableOpacity style={styles.resetButton} onPress={resetPassword}>
-                                <Text style={{ fontWeight: 'bold', fontSize: 20, textAlign: 'center' }}>Reset Password</Text>
+                            <TouchableOpacity style={[styles.resetButton, dynamicStyles.button]} onPress={resetPassword}>
+                                <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20, textAlign: 'center' }]}>Reset Password</Text>
                             </TouchableOpacity>
                             {successMessage ? (
                                 <View style={{ flex: 1 }}>
@@ -92,19 +123,16 @@ export default function ResetPasswordScreen() {
     )
 }
 
-
 const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 20,
-        backgroundColor: '#61EDFF',
         padding: 10,
         paddingHorizontal: 20
     },
     emailField: {
-        backgroundColor: '#86eff5',
         borderRadius: 10,
         width: '100%',
         marginBottom: 5,
@@ -114,7 +142,6 @@ const styles = StyleSheet.create({
     },
     resetButton: {
         width: '100%',
-        backgroundColor: '#00B1BA',
         height: 45,
         borderRadius: 10,
         alignSelf: 'center',

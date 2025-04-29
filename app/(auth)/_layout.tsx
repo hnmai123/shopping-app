@@ -1,10 +1,10 @@
 import { Stack } from 'expo-router';
 import React from 'react';
-import { ThemeProvider } from '../Context/ThemeContext'; // Add this import
+import { ThemeProvider } from '../Context/ThemeContext'; 
 
 export default function AuthLayout() {
     return (
-        // Wrap your Stack with ThemeProvider
+        
         <ThemeProvider>
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="login" options={{
