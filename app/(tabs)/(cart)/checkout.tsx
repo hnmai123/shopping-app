@@ -4,6 +4,7 @@ import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
+import { useTheme } from '../../Context/ThemeContext';
 
 export default function CheckoutScreen() {
     type RootStackParamList = {
@@ -22,45 +23,79 @@ export default function CheckoutScreen() {
         checkout: { cart: any[]; cartCount: number; totalAmount: number };
     };
 
-    const navigation = useNavigation<NavigationProp<NavigationStackParamList>>(); // Access the navigation object
-
+    const navigation = useNavigation<NavigationProp<NavigationStackParamList>>();
     const route = useRoute<CheckoutScreenRouteProp>();
     const { cart, cartCount, totalAmount } = route.params;
+    const { theme, toggleTheme, isDarkMode } = useTheme();
+
+    const dynamicStyles = StyleSheet.create({
+        container: {
+            backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
+        },
+        header: {
+            backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF',
+        },
+        text: {
+            color: isDarkMode ? '#FFFFFF' : 'black',
+        },
+        secondaryText: {
+            color: isDarkMode ? '#BBBBBB' : '#666666',
+        },
+        card: {
+            backgroundColor: isDarkMode ? '#1E1E1E' : '#FFFFFF',
+        },
+        cardHeader: {
+            backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
+        },
+        cartSummary: {
+            backgroundColor: isDarkMode ? '#383838' : '#86eff5',
+        },
+        button: {
+            backgroundColor: isDarkMode ? '#00B1BA' : '#00B1BA',
+        },
+        icon: {
+            color: isDarkMode ? '#FFFFFF' : 'black',
+        }
+    });
 
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
-            <SafeAreaView style={styles.container}>
-                <View style={styles.header}>
+            <SafeAreaView style={[styles.container, dynamicStyles.container]}>
+                <View style={[styles.header, dynamicStyles.header]}>
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <Text style={{ fontSize: 20 }}>Cancel</Text>
+                        <Text style={[dynamicStyles.text, { fontSize: 20 }]}>Cancel</Text>
                     </TouchableOpacity>
-                    <Text style={{ fontWeight: 'bold', fontSize: 35 }}>Checkout
-                        <Text style={{ fontSize: 12 }}> ({cartCount})</Text>
+                    <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 35 }]}>Checkout
+                        <Text style={[dynamicStyles.text, { fontSize: 12 }]}> ({cartCount})</Text>
                     </Text>
-                    <TouchableOpacity >
-                        <MaterialIcons name="dark-mode" size={24} color="black" />
+                    <TouchableOpacity onPress={toggleTheme}>
+                        <MaterialIcons 
+                            name={isDarkMode ? 'wb-sunny' : 'dark-mode'} 
+                            size={24} 
+                            color={isDarkMode ? '#FFD700' : 'black'} 
+                        />
                     </TouchableOpacity>
                 </View>
-                <View style={styles.cartContainer}>
+                <View style={[styles.cartContainer, dynamicStyles.container]}>
                     <FlatList
                         data={cart}
                         keyExtractor={(item) => item.id}
                         renderItem={({ item }) => (
-                            <View style={styles.productCard}>
-                                <View style={styles.cardHeader}>
-                                    <Ionicons name="storefront-outline" size={24} color="black" style={{ position: 'absolute', left: "2%" }} />
-                                    <Text style={{ fontSize: 22 }}>{item.seller}</Text>
+                            <View style={[styles.productCard, dynamicStyles.card]}>
+                                <View style={[styles.cardHeader, dynamicStyles.cardHeader]}>
+                                    <Ionicons name="storefront-outline" size={24} color={dynamicStyles.icon.color} style={{ position: 'absolute', left: "2%" }} />
+                                    <Text style={[dynamicStyles.text, { fontSize: 22 }]}>{item.seller}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', padding: 5 }}>
                                     <Image source={{ uri: item.image }} style={styles.productImage} />
                                     <View style={styles.productInfo}>
-                                        <Text style={{ fontSize: 18, marginBottom: 5 }}>{item.name}</Text>
-                                        <Text>{formatter.format(item.price)}</Text>
-                                        <Text>Quantity: {item.quantity}</Text>
+                                        <Text style={[dynamicStyles.text, { fontSize: 18, marginBottom: 5 }]}>{item.name}</Text>
+                                        <Text style={dynamicStyles.text}>{formatter.format(item.price)}</Text>
+                                        <Text style={dynamicStyles.text}>Quantity: {item.quantity}</Text>
 
                                         <View style={{ marginTop: 10 }}>
-                                            <Text style={{ marginBottom: 5 }}>Total Price: {formatter.format(item.quantity * item.price)}</Text>
-                                            <Text style={{ color: '#666666', fontSize: 12 }}>Include GST of {formatter.format(item.quantity * item.price / 11)}</Text>
+                                            <Text style={[dynamicStyles.text, { marginBottom: 5 }]}>Total Price: {formatter.format(item.quantity * item.price)}</Text>
+                                            <Text style={[dynamicStyles.secondaryText, { fontSize: 12 }]}>Include GST of {formatter.format(item.quantity * item.price / 11)}</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -68,36 +103,36 @@ export default function CheckoutScreen() {
                         )}
                     />
                 </View>
-                <View style={styles.cartSummary}>
+                <View style={[styles.cartSummary, dynamicStyles.cartSummary]}>
                     <View style={styles.cartSummaryRow}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
-                            <Ionicons name="location-outline" size={24} color="black" />
-                            <Text style={{ marginLeft: 5 }}>Shipping address</Text>
+                            <Ionicons name="location-outline" size={24} color={dynamicStyles.icon.color} />
+                            <Text style={[dynamicStyles.text, { marginLeft: 5 }]}>Shipping address</Text>
                         </View>
                         <TouchableOpacity>
-                            <Text style={{ color: '#666666' }}>Default Address {">"}</Text>
+                            <Text style={dynamicStyles.secondaryText}>Default Address {">"}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.cartSummaryRow}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
-                            <MaterialIcons name="local-shipping" size={24} color="black" />
-                            <Text style={{ marginLeft: 5 }}>Shipping cost</Text>
+                            <MaterialIcons name="local-shipping" size={24} color={dynamicStyles.icon.color} />
+                            <Text style={[dynamicStyles.text, { marginLeft: 5 }]}>Shipping cost</Text>
                         </View>
-                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{formatter.format(0)}</Text>
+                        <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20 }]}>{formatter.format(0)}</Text>
                     </View>
                     <View style={styles.cartSummaryRow}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', padding: 5 }}>
-                            <MaterialIcons name="payment" size={24} color="black" />
-                            <Text style={{ marginLeft: 5 }}>Payment method</Text>
+                            <MaterialIcons name="payment" size={24} color={dynamicStyles.icon.color} />
+                            <Text style={[dynamicStyles.text, { marginLeft: 5 }]}>Payment method</Text>
                         </View>
                         <TouchableOpacity>
-                            <Text style={{ color: '#666666' }}>Default Payment {">"}</Text>
+                            <Text style={dynamicStyles.secondaryText}>Default Payment {">"}</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.cartSummaryRow}>
-                        <Text>Total Amount</Text>
-                        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>{formatter.format(totalAmount)}</Text>
-                        <TouchableOpacity style={{ backgroundColor: '#00B1BA', height: 45, borderRadius: 5, justifyContent: 'center', alignItems: 'center', padding: 10 }}>
+                        <Text style={dynamicStyles.text}>Total Amount</Text>
+                        <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20 }]}>{formatter.format(totalAmount)}</Text>
+                        <TouchableOpacity style={[styles.placeOrderButton, dynamicStyles.button]}>
                             <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white' }}>Place Order</Text>
                         </TouchableOpacity>
                     </View>
@@ -111,28 +146,23 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingTop: 20,
-        backgroundColor: '#e9f5f9',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         marginBottom: 5,
-        backgroundColor: '#61EDFF',
         padding: 10,
         paddingHorizontal: 20
     },
     cartContainer: {
-        backgroundColor: '#e9f5f9',
         flex: 1
     },
     productCard: {
-        backgroundColor: '#FFFFFF',
         borderRadius: 10,
         margin: 10,
     },
     cardHeader: {
-        backgroundColor: '#61EDFF',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
@@ -153,7 +183,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
     },
     cartSummary: {
-        backgroundColor: '#86eff5',
         borderRadius: 10,
         margin: 10,
         width: '95%',
@@ -166,5 +195,12 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ffffff',
         padding: 10,
         alignItems: 'center',
+    },
+    placeOrderButton: {
+        height: 45,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 10
     }
-})
+});

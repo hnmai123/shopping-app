@@ -5,12 +5,14 @@ import { db } from '../../firebase/firebaseConfig';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import filter from 'lodash.filter';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useCart } from '../../context/CartContext'; // Import the useCart hook
+import { useCart } from '../../context/CartContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React from 'react';
+import { useTheme } from '../Context/ThemeContext';
 
 export default function HomeScreen() {
-  const { cart, updateCart } = useCart(); // Access global cart state
+  const { cart, updateCart } = useCart();
+  const { theme, toggleTheme, isDarkMode } = useTheme();
 
   interface Product {
     id: string;
@@ -21,6 +23,7 @@ export default function HomeScreen() {
     price: number;
     seller: string;
   };
+
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'AUD',
@@ -63,7 +66,6 @@ export default function HomeScreen() {
     fetchData();
   }, []);
 
-
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     const formatterdquery = query.toLowerCase();
@@ -72,6 +74,7 @@ export default function HomeScreen() {
     })
     setData(filteredData);
   }
+
   const contains = ({ name, description }: { name: string; description: string }, query: string) => {
     if (name.toLowerCase().includes(query) || description.toLowerCase().includes(query)) {
       return true;
@@ -79,11 +82,56 @@ export default function HomeScreen() {
     return false;
   }
 
+  const addtoCart = (product: any) => {
+    updateCart((previousCart: any[]) => {
+      const existingProduct = previousCart.find((item) => item.id === product.id);
+      if (existingProduct) {
+        return previousCart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        return [...previousCart, { ...product, quantity: 1 }];
+      }
+    });
+  };
+
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      backgroundColor: isDarkMode ? '#121212' : '#61EDFF',
+    },
+    header: {
+      backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF',
+    },
+    text: {
+      color: isDarkMode ? '#FFFFFF' : 'black',
+    },
+    searchContainer: {
+      backgroundColor: isDarkMode ? '#383838' : '#FFFFFF',
+    },
+    searchText: {
+      color: isDarkMode ? '#FFFFFF' : 'black',
+    },
+    productCard: {
+      backgroundColor: isDarkMode ? '#1E1E1E' : '#FFFFFF',
+    },
+    productList: {
+      backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
+    },
+    textContainer: {
+      backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
+    },
+    loadingBackground: {
+      backgroundColor: isDarkMode ? '#121212' : '#61EDFF',
+    }
+  });
+
   if (isLoading) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#61EDFF' }}>
-          <ActivityIndicator size="large" color="#0000ff" />
+        <View style={[styles.loadingContainer, dynamicStyles.loadingBackground]}>
+          <ActivityIndicator size="large" color={isDarkMode ? '#FFFFFF' : '#0000ff'} />
         </View>
       </GestureHandlerRootView>
     );
@@ -92,51 +140,39 @@ export default function HomeScreen() {
   if (error) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#61EDFF' }}>
-          <Text>{error}</Text>
+        <View style={[styles.loadingContainer, dynamicStyles.loadingBackground]}>
+          <Text style={dynamicStyles.text}>{error}</Text>
         </View>
       </GestureHandlerRootView>
     );
   }
 
-  const addtoCart = (product: any) => {
-    updateCart((previousCart: any[]) => {
-      const existingProduct = previousCart.find((item) => item.id === product.id);
-      if (existingProduct) {
-        // If the product exists, increase its quantity
-        return previousCart.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      } else {
-        // If the product does not exist, add it with quantity 1
-        return [...previousCart, { ...product, quantity: 1 }];
-      }
-    });
-  };
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.searchContainer}>
-            <Ionicons name="search" size={24} color="black" style={{ marginRight: 10 }} />
+      <SafeAreaView style={[styles.container, dynamicStyles.container]}>
+        <View style={[styles.header, dynamicStyles.header]}>
+          <View style={[styles.searchContainer, dynamicStyles.searchContainer]}>
+            <Ionicons name="search" size={24} color={isDarkMode ? '#FFFFFF' : 'black'} style={{ marginRight: 10 }} />
             <TextInput
               placeholder="Search ..."
+              placeholderTextColor={isDarkMode ? '#BBBBBB' : '#666666'}
               clearButtonMode="always"
-              style={styles.searchBox}
+              style={[styles.searchBox, dynamicStyles.searchText]}
               autoCapitalize="none"
               autoCorrect={false}
               value={searchQuery}
               onChangeText={(query) => handleSearch(query)}
             />
             <TouchableOpacity>
-              <Ionicons name="camera-outline" size={24} color="black" />
+              <Ionicons name="camera-outline" size={24} color={isDarkMode ? '#FFFFFF' : 'black'} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.darkModeButton}>
-            <MaterialIcons name="dark-mode" size={24} color="black" />
+          <TouchableOpacity style={styles.darkModeButton} onPress={toggleTheme}>
+            <MaterialIcons 
+              name={isDarkMode ? 'wb-sunny' : 'dark-mode'} 
+              size={24} 
+              color={isDarkMode ? '#FFD700' : 'black'} 
+            />
           </TouchableOpacity>
         </View>
 
@@ -144,16 +180,16 @@ export default function HomeScreen() {
           data={data}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <TouchableOpacity style={styles.productCard} onPress={() => addtoCart(item)}>
+            <TouchableOpacity style={[styles.productCard, dynamicStyles.productCard]} onPress={() => addtoCart(item)}>
               <Image source={{ uri: item.image }} style={styles.productImage} />
-              <View style={styles.textContainer}>
-                <Text style={{ fontSize: 12, paddingBottom: 15 }}>{item.name}</Text>
-                <Text style={{ fontSize: 10 }}>{formatter.format(item.price)}</Text>
+              <View style={[styles.textContainer, dynamicStyles.textContainer]}>
+                <Text style={[dynamicStyles.text, { fontSize: 12, paddingBottom: 15 }]}>{item.name}</Text>
+                <Text style={[dynamicStyles.text, { fontSize: 10 }]}>{formatter.format(item.price)}</Text>
               </View>
             </TouchableOpacity>
           )}
           numColumns={2}
-          contentContainerStyle={styles.productList}
+          contentContainerStyle={[styles.productList, dynamicStyles.productList]}
         />
       </SafeAreaView>
     </GestureHandlerRootView>
@@ -167,7 +203,6 @@ const cardWidth = (screenWidth / 2) - (cardMargin * 3);
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#61EDFF',
     paddingTop: 20,
   },
   searchBox: {
@@ -177,7 +212,6 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 10,
     paddingHorizontal: 10,
     height: 46,
@@ -188,7 +222,6 @@ const styles = StyleSheet.create({
   productCard: {
     width: cardWidth,
     margin: cardMargin,
-    backgroundColor: '#fff',
     borderRadius: 5,
     overflow: 'hidden',
     alignItems: 'center'
@@ -200,10 +233,8 @@ const styles = StyleSheet.create({
   },
   productList: {
     padding: cardMargin,
-    backgroundColor: '#e9f5f9',
   },
   textContainer: {
-    backgroundColor: '#61EDFF',
     width: '100%',
     padding: 5
   },
@@ -211,15 +242,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#61EDFF',
   },
   darkModeButton: {
-    height: 46, // Match the height of the search bar
+    height: 46,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: '7%',
     marginBottom: 10,
   },
-
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
-

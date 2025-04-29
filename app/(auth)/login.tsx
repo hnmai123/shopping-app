@@ -5,7 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { auth } from '../../firebase/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React from 'react';
-import { useTheme } from '../Context/ThemeContext'; // Add this import
+import { useTheme } from '../Context/ThemeContext'; 
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -13,7 +13,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
-  const { theme, toggleTheme, isDarkMode } = useTheme(); // Get theme values
+  const { theme, toggleTheme, isDarkMode } = useTheme();
 
   const handleLogin = async () => {
     try {
@@ -26,7 +26,7 @@ export default function LoginScreen() {
     }
   };
 
-  // Add dark mode styles
+
   const dynamicStyles = StyleSheet.create({
     container: {
       flex: 1,
@@ -59,7 +59,7 @@ export default function LoginScreen() {
           <Text style={[styles.appName, dynamicStyles.text]}>PACKME</Text>
           <Text style={[styles.appTarget, dynamicStyles.text]}>Login to your account</Text>
           
-          {/* Add the theme toggle button (moon/sun icon) */}
+          
           <TouchableOpacity 
             style={{ position: 'absolute', right: 20, top: 20 }}
             onPress={toggleTheme}
@@ -123,7 +123,7 @@ export default function LoginScreen() {
   );
 }
 
-// Keep your original styles as they were
+
 const styles = StyleSheet.create({
   containter: {
     flex: 1,
