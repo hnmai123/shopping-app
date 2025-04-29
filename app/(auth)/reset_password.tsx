@@ -7,7 +7,7 @@ import { useState } from "react";
 import { auth } from "../../firebase/firebaseConfig";
 import { sendPasswordResetEmail } from "firebase/auth";
 import React from "react";
-import { useTheme } from "../Context/ThemeContext";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function ResetPasswordScreen() {
     const navigation = useNavigation();

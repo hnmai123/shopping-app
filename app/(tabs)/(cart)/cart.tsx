@@ -6,7 +6,7 @@ import { useCart } from '../../../context/CartContext';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import React from 'react';
-import { useTheme } from '../../Context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 
 export default function Cart() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();

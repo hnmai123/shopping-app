@@ -8,7 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCart } from '../../context/CartContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React from 'react';
-import { useTheme } from '../Context/ThemeContext';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function HomeScreen() {
   const { cart, updateCart } = useCart();

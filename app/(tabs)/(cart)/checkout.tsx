@@ -4,7 +4,7 @@ import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React from 'react';
-import { useTheme } from '../../Context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 
 export default function CheckoutScreen() {
     type RootStackParamList = {

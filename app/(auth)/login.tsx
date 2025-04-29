@@ -5,7 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { auth } from '../../firebase/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React from 'react';
-import { useTheme } from '../Context/ThemeContext'; 
+import { useTheme } from '../../context/ThemeContext'; 
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -65,7 +65,7 @@ export default function LoginScreen() {
             onPress={toggleTheme}
           >
             <MaterialIcons 
-              name={isDarkMode ? 'wb-sunny' : 'brightness-3'} 
+              name={isDarkMode ? 'wb-sunny' : 'dark-mode'} 
               size={25} 
               color={isDarkMode ? '#FFD700' : '#000'} 
             />
