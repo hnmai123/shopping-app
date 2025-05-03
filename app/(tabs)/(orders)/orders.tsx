@@ -36,7 +36,7 @@ const OrderStatusBar = () => {
         <Text style={[styles.statusBarText, isDarkMode ? { color: '#FFFFFF' } : { color: '#333' }]}>Confirming</Text>
       </View>
       <View style={styles.statusBarItem}>
-        <Ionicons name="package-outline" size={24} color="#FF9500" />
+        <Ionicons name="gift-outline" size={24} color="#FF9500" />
         <Text style={[styles.statusBarText, isDarkMode ? { color: '#FFFFFF' } : { color: '#333' }]}>Preparing</Text>
       </View>
       <View style={styles.statusBarItem}>
