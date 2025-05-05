@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 10,
     height: 46,
-    marginBottom: 10,
+    marginVertical: 10,
     width: '80%',
     marginLeft: 10
   },

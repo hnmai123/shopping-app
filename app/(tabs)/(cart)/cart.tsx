@@ -43,7 +43,7 @@ export default function Cart() {
 
     const dynamicStyles = StyleSheet.create({
         container: {
-            backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
+            backgroundColor: isDarkMode ? '#121212' : '#61EDFF',
         },
         header: {
             backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF',
@@ -68,6 +68,9 @@ export default function Cart() {
         },
         icon: {
             color: isDarkMode ? '#FFFFFF' : 'black',
+        },
+        cartContainer: {
+            backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
         }
     });
 
@@ -89,7 +92,7 @@ export default function Cart() {
                         />
                     </TouchableOpacity>
                 </View>
-                <View style={[styles.cartContainer, dynamicStyles.container]}>
+                <View style={[styles.cartContainer, dynamicStyles.cartContainer]}>
                     {cart.length === 0 ? (
                         <View style={[styles.emptyCartContainer, dynamicStyles.card]}>
                             <Text style={[styles.emptyCartText, dynamicStyles.text]}>Your cart is empty!</Text>
