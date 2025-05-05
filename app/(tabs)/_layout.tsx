@@ -1,31 +1,30 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { Platform } from 'react-native';
-
+import { StyleSheet } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { isDarkMode } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: isDarkMode ? '#FFFFFF' : Colors.light.tint,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
+        tabBarStyle: [
+          styles.tabBar, // Base styles
+          { backgroundColor: isDarkMode ? '#121212' : '#FFFFFF' }, // Dynamic background color
+        ],
       }}>
       <Tabs.Screen
         name="index"
@@ -48,6 +47,21 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons size={28} name="bag-check-outline" color={color} />,
         }}
       />
+      <Tabs.Screen
+        name="(profile)"
+        options={{
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="person-outline" color={color} />,
+        }}
+      />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabBar: {
+    borderTopWidth: 0, // Remove border for a cleaner look
+    position: Platform.OS === 'ios' ? 'absolute' : 'relative', // Float on iOS
+    elevation: 5, // Add shadow on Android
+  },
+});
