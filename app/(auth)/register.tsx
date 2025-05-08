@@ -4,10 +4,11 @@ import { useState } from "react";
 import { TouchableOpacity, View, Text, StyleSheet, Image, TextInput } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth } from "../../firebase/firebaseConfig";
+import { auth, db } from "../../firebase/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import React from "react";
 import { useTheme } from "../../context/ThemeContext";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 export default function Register() {
     const navigation = useNavigation();
@@ -20,6 +21,7 @@ export default function Register() {
     const [error, setError] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const { theme, toggleTheme, isDarkMode } = useTheme();
+    const [name, setName] = useState('');
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,8 +39,18 @@ export default function Register() {
         } else {
             try {
                 setError('');
-                await createUserWithEmailAndPassword(auth, email, password);
+                const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredentials.user;
+
+                await setDoc(doc(db, 'users', user.uid), {
+                    email: email,
+                    name: name,
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                });
+
                 setSuccessMessage('Account created successfully, please sign in!');
+
                 setTimeout(() => {
                     navigation.goBack();
                 }, 1000);
@@ -115,6 +127,18 @@ export default function Register() {
                         />
 
                         {emailError ? <Text style={{ color: 'red', fontSize: 14, marginBottom: 10, width: '78%', alignSelf: 'center', marginLeft: 10 }}>{emailError}</Text> : null}
+                        
+                        <TextInput
+                            placeholder="Name"
+                            style={[styles.loginField, dynamicStyles.input]}
+                            placeholderTextColor="#989898"
+                            value={name}
+                            autoCapitalize='none'
+                            autoCorrect={false}
+                            onChangeText={(text) => {
+                                setName(text);
+                            }}
+                        />
 
                         <View style={[styles.passwordContainer, dynamicStyles.input]}>
                             <TextInput

@@ -7,6 +7,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useNavigation, NavigationProp } from '@react-navigation/native';
 import React from 'react';
 import { useTheme } from '../../../context/ThemeContext';
+import { syncCartToFirestore, deleteItemFromFirestore } from '@/firebase/cartService';
 
 export default function Cart() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -23,7 +24,7 @@ export default function Cart() {
         currency: 'AUD',
     });
 
-    const updateQuantity = (item: any, action: string) => {
+    const updateQuantity = async (item: any, action: string) => {
         const updatedCart = cart.map((cartItem: any) => {
             if (cartItem.id === item.id) {
                 const newQuantity = action === 'increase' ? cartItem.quantity + 1 : cartItem.quantity - 1;
@@ -32,11 +33,13 @@ export default function Cart() {
             return cartItem;
         })
         updateCart(updatedCart);
+        await syncCartToFirestore(updatedCart);
     }
 
-    const deleteItem = (item: any) => {
+    const deleteItem = async (item: any) => {
         const updatedCart = cart.filter((cartItem: any) => cartItem.id !== item.id);
         updateCart(updatedCart);
+        await deleteItemFromFirestore(item.id);
     };
 
     const totalAmount = cart.reduce((total: number, item: any) => total + item.price * item.quantity, 0);

@@ -1,7 +1,8 @@
 import { StyleSheet, View, Text, SafeAreaView, TextInput, Image, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 import { doc, getDocs, collection } from 'firebase/firestore';
-import { db } from '../../firebase/firebaseConfig';
+import { getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db, auth } from '../../firebase/firebaseConfig';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import filter from 'lodash.filter';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -82,7 +83,42 @@ export default function HomeScreen() {
     return false;
   }
 
-  const addtoCart = (product: any) => {
+  const addtoCart = async (product: any) => {
+    const user = auth.currentUser;
+    if (!user) {
+      setError("Please log in to add items to your cart.");
+      return;
+    }
+
+    const cartRef = doc(db, 'carts', user.uid);
+    const cartDoc = await getDoc(cartRef);
+
+    let updatedItems = [];
+    if (!cartDoc.exists()) {
+      updatedItems = [{ ...product, quantity: 1 }];
+      await setDoc(cartRef, {
+        items: updatedItems,
+        updatedAt: serverTimestamp(),
+      });
+    } else {
+      const cartData = cartDoc.data();
+      const existingItems = cartData.items.find((item: any) => item.id === product.id);
+      if (existingItems) {
+        updatedItems = cartData.items.map((item: any) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        updatedItems = [...cartData.items, { ...product, quantity: 1 }];
+      }
+
+      await updateDoc(cartRef, {
+        items: updatedItems,
+        updatedAt: serverTimestamp(),
+      });
+    }
+    
     updateCart((previousCart: any[]) => {
       const existingProduct = previousCart.find((item) => item.id === product.id);
       if (existingProduct) {

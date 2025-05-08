@@ -1,6 +1,6 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React from "react";
-import { SafeAreaView, StyleSheet, TouchableOpacity, Text, View, Image, Touchable, ScrollView } from "react-native";
+import { SafeAreaView, StyleSheet, TouchableOpacity, Text, View, Image, ScrollView } from "react-native";
 import { useTheme } from '../../../context/ThemeContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { auth } from "@/firebase/firebaseConfig";
@@ -11,10 +11,20 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MapLocation from '@/components/MapLocation';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { db } from "@/firebase/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function Account() {
   const { theme, toggleTheme, isDarkMode } = useTheme();
-  const [user, setUser] = useState(null);
+  interface User {
+    nickname?: string;
+    name?: string;
+    email?: string;
+    points?: number;
+    // Add other fields as needed based on your Firestore user document structure
+  }
+  
+  const [user, setUser] = useState<User | null>(null);
   const [address, setAddress] = useState('');
   const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const navigation = useNavigation();
@@ -25,10 +35,17 @@ export default function Account() {
   };
 
   useEffect(() => {
-    const currentUser = auth.currentUser;
-    if (currentUser) {
-
-    }
+    const fetchUserProfile = async () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const userData = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userData);
+        if (userSnap.exists()) {
+          setUser(userSnap.data());
+        }
+      }
+    };
+    fetchUserProfile();
   }, []);
   const handleLogout = async () => {
     try {
@@ -115,7 +132,7 @@ export default function Account() {
 
           <View style={[styles.header, dynamicStyles.header]}>
             <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.navigate('supplier' as never)}>
-            <MaterialCommunityIcons name="store-edit-outline" size={30} color={dynamicStyles.text.color} />
+              <MaterialCommunityIcons name="store-edit-outline" size={30} color={dynamicStyles.text.color} />
             </TouchableOpacity>
             <Text style={[{ fontSize: 40, fontWeight: 'bold' }, , dynamicStyles.text]}>Account</Text>
             <TouchableOpacity style={{ marginRight: "7%" }} onPress={toggleTheme}>
@@ -132,12 +149,12 @@ export default function Account() {
                 <Image
                   source={require('@/assets/images/Acount.png')}
                   style={{ width: 50, height: 50, borderRadius: 50 }} />
-                <Text style={dynamicStyles.text}>Nickname</Text>
+                <Text style={dynamicStyles.text}>{user?.nickname || "Nickname"}</Text>
               </View>
               <View style={{ flex: 1, marginLeft: 20 }}>
-                <Text style={dynamicStyles.text}>Username</Text>
+                <Text style={dynamicStyles.text}>{user?.name || "Name"}</Text>
                 <Text style={dynamicStyles.text}>Your Point</Text>
-                <Text style={dynamicStyles.text}>Email</Text>
+                <Text style={dynamicStyles.text}>{user?.email || "Email"}</Text>
               </View>
             </View>
 
