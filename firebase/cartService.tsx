@@ -2,38 +2,37 @@ import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firest
 import { db, auth } from "../firebase/firebaseConfig";
 
 export const syncCartToFirestore = async (cartItems: any[]) => {
-  const user = auth.currentUser;
-  if (!user) return;
+    const user = auth.currentUser;
+    if (!user) return;
 
-  const cartRef = doc(db, "carts", user.uid);
+    const cartRef = doc(db, "carts", user.uid);
 
-  const simplifiedItems = cartItems.map(item => ({
-    productId: item.id,
-    quantity: item.quantity,
-  }));
+    const simplifiedItems = cartItems.map(item => ({
+        productId: item.id,
+        quantity: item.quantity,
+    }));
 
-  await setDoc(cartRef, {
-    items: simplifiedItems,
-    updatedAt: serverTimestamp(),
-  });
+    await setDoc(cartRef, {
+        items: simplifiedItems,
+        updatedAt: serverTimestamp(),
+    });
 };
 
 export const deleteItemFromFirestore = async (productId: string) => {
-  const user = auth.currentUser;
-  if (!user) return;
+    const user = auth.currentUser;
+    if (!user) return;
 
-  const cartRef = doc(db, "carts", user.uid);
-  const cartSnap = await getDoc(cartRef);
+    const cartRef = doc(db, "carts", user.uid);
+    const cartSnap = await getDoc(cartRef);
 
-  if (!cartSnap.exists()) return;
+    if (!cartSnap.exists()) return;
 
-  const cartData = cartSnap.data();
-  const filteredItems = cartData.items.filter((item: any) => item.productId !== productId);
-
-  await updateDoc(cartRef, {
-    items: filteredItems,
-    updatedAt: serverTimestamp(),
-  });
+    const cartData = cartSnap.data();
+    const filteredItems = cartData.items.filter((item: any) => item.id !== productId);
+    await updateDoc(cartRef, {
+        items: filteredItems,
+        updatedAt: serverTimestamp(),
+    });
 };
 
 export const fetchProductDetails = async (productId: string) => {

@@ -8,29 +8,30 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     const [cart, setCart] = useState<any[]>([]);
 
     useEffect(() => {
-        const fetchCart = async () => {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const cartRef = doc(db, "carts", user.uid);
-            const cartDoc = await getDoc(cartRef);
-            if (!cartDoc.exists()) return;
-
-            const cartItems = cartDoc.data().items || [];
-
-            const hydratedCart = await Promise.all(
-                cartItems.map(async (item: any) => {
-                    const product = await fetchProductDetails(item.productId);
-                    return {
-                        ...product,
-                        quantity: item.quantity,
-                    };
-                })
-            );
-            setCart(hydratedCart);
-        };
-        fetchCart();
-    }, []);
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
+          if (!user) {
+            setCart([]);
+            return;
+          }
+      
+          const cartRef = doc(db, "carts", user.uid);
+          const cartDoc = await getDoc(cartRef);
+          if (!cartDoc.exists()) return;
+      
+          const cartItems = cartDoc.data().items || [];
+      
+          const hydratedCart = await Promise.all(
+            cartItems.map(async (item: any) => {
+              const product = await fetchProductDetails(item.id);
+              return product ? { ...product, quantity: item.quantity } : null;
+            })
+          );
+      
+          setCart(hydratedCart.filter(Boolean)); // remove any null products
+        });
+      
+        return () => unsubscribe();
+      }, []);
 
     const updateCart = (updatedCart: any[]) => {
         setCart(updatedCart);

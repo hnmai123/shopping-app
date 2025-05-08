@@ -13,9 +13,11 @@ import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { db } from "@/firebase/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import { useCart } from '@/context/CartContext';
 
 export default function Account() {
   const { theme, toggleTheme, isDarkMode } = useTheme();
+  const { updateCart } = useCart();
   interface User {
     nickname?: string;
     name?: string;
@@ -49,6 +51,7 @@ export default function Account() {
   }, []);
   const handleLogout = async () => {
     try {
+      updateCart([]);
       await auth.signOut(); // Firebase sign-out
       navigation.navigate("(auth)" as never); // Navigate to the Login screen after logout
     } catch (error) {
