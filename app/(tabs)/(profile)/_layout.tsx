@@ -19,6 +19,14 @@ export default function ProfileLayout() {
                     // Removed tabBarStyle as it is not valid for Stack.Screen
                 }}
             />
+            <Stack.Screen
+                name="map"
+                options={{
+                    title: 'Map',
+                    presentation: 'modal',
+                    headerShown: false,
+                }}
+            />
         </Stack>
     );
 }

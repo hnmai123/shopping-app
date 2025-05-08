@@ -1,40 +1,52 @@
+// Account.tsx (Fixed version)
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import React from "react";
-import { SafeAreaView, StyleSheet, TouchableOpacity, Text, View, Image, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  View,
+  Image,
+  ScrollView,
+} from "react-native";
 import { useTheme } from '../../../context/ThemeContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { auth } from "@/firebase/firebaseConfig";
-import { useState, useEffect } from "react";
 import Fontisto from '@expo/vector-icons/Fontisto';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import MapLocation from '@/components/MapLocation';
-import { useNavigation } from '@react-navigation/native';
+import MapComponent from '@/components/Map';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { db } from "@/firebase/firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from '@/firebase/firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 import { useCart } from '@/context/CartContext';
+
+// Types for navigation route
+interface User {
+  nickname?: string;
+  name?: string;
+  email?: string;
+  points?: number;
+}
+
+type RootStackParamList = {
+  account: { location?: { latitude: number; longitude: number }; address?: string };
+  map: undefined;
+};
 
 export default function Account() {
   const { theme, toggleTheme, isDarkMode } = useTheme();
   const { updateCart } = useCart();
-  interface User {
-    nickname?: string;
-    name?: string;
-    email?: string;
-    points?: number;
-    // Add other fields as needed based on your Firestore user document structure
-  }
-  
+  const navigation = useNavigation();
+  const route = useRoute<RouteProp<RootStackParamList, 'account'>>();
+
   const [user, setUser] = useState<User | null>(null);
   const [address, setAddress] = useState('');
-  const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
-  const navigation = useNavigation();
-
-  const handleAddressRetrieved = (addr: string | null, location: { latitude: number; longitude: number } | null) => {
-    setAddress(addr || '');
-    setCoords(location || null);
-  };
+  const [coords, setCoords] = useState({
+    latitude: -33.8688,
+    longitude: 151.2093,
+  });
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -49,11 +61,20 @@ export default function Account() {
     };
     fetchUserProfile();
   }, []);
+
+  // Apply new location if returned from Map screen
+  useEffect(() => {
+    if (route.params?.location && route.params?.address) {
+      setCoords(route.params.location);
+      setAddress(route.params.address);
+    }
+  }, [route.params]);
+
   const handleLogout = async () => {
     try {
       updateCart([]);
-      await auth.signOut(); // Firebase sign-out
-      navigation.navigate("(auth)" as never); // Navigate to the Login screen after logout
+      await auth.signOut();
+      navigation.navigate('(auth)' as never);
     } catch (error) {
       console.error("Error logging out:", error);
     }
@@ -68,24 +89,6 @@ export default function Account() {
     },
     text: {
       color: isDarkMode ? '#FFFFFF' : 'black',
-    },
-    searchContainer: {
-      backgroundColor: isDarkMode ? '#383838' : '#FFFFFF',
-    },
-    searchText: {
-      color: isDarkMode ? '#FFFFFF' : 'black',
-    },
-    productCard: {
-      backgroundColor: isDarkMode ? '#1E1E1E' : '#FFFFFF',
-    },
-    productList: {
-      backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
-    },
-    textContainer: {
-      backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
-    },
-    loadingBackground: {
-      backgroundColor: isDarkMode ? '#121212' : '#61EDFF',
     },
     card: {
       flexDirection: 'row',
@@ -125,19 +128,18 @@ export default function Account() {
       width: '95%',
       borderRadius: 10,
       marginVertical: 5,
-    }
+    },
   });
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={[styles.container, dynamicStyles.container]}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}>
-
           <View style={[styles.header, dynamicStyles.header]}>
             <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.navigate('supplier' as never)}>
               <MaterialCommunityIcons name="store-edit-outline" size={30} color={dynamicStyles.text.color} />
             </TouchableOpacity>
-            <Text style={[{ fontSize: 40, fontWeight: 'bold' }, , dynamicStyles.text]}>Account</Text>
+            <Text style={[{ fontSize: 40, fontWeight: 'bold' }, dynamicStyles.text]}>Account</Text>
             <TouchableOpacity style={{ marginRight: "7%" }} onPress={toggleTheme}>
               <MaterialIcons
                 name={isDarkMode ? 'wb-sunny' : 'dark-mode'}
@@ -146,12 +148,14 @@ export default function Account() {
               />
             </TouchableOpacity>
           </View>
+
           <View style={{ backgroundColor: isDarkMode ? '#121212' : '#e9f5f9', flex: 1, alignItems: 'center' }}>
             <View style={dynamicStyles.card}>
               <View style={{ flexDirection: 'column', alignItems: 'center' }}>
                 <Image
                   source={require('@/assets/images/Acount.png')}
-                  style={{ width: 50, height: 50, borderRadius: 50 }} />
+                  style={{ width: 50, height: 50, borderRadius: 50 }}
+                />
                 <Text style={dynamicStyles.text}>{user?.nickname || "Nickname"}</Text>
               </View>
               <View style={{ flex: 1, marginLeft: 20 }}>
@@ -161,6 +165,26 @@ export default function Account() {
               </View>
             </View>
 
+            {/* Address Section */}
+            <View style={dynamicStyles.addressCard}>
+              <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
+                <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Billing & Shipping Address</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
+                <TouchableOpacity style={{ width: '50%', marginRight: 10 }} onPress={() => navigation.navigate('map' as never)}>
+                  <MapComponent initialLocation={coords} selectable={false} height={150} />
+                </TouchableOpacity>
+                <View style={{ flex: 1, marginLeft: 5 }}>
+                  <Text style={dynamicStyles.text}>{address || "Address"}</Text>
+                  <TouchableOpacity>
+                    <Text style={dynamicStyles.text}>Using your location</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => navigation.navigate('map' as never)}>
+                    <Text style={dynamicStyles.text}>Change {">"}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
             <View style={dynamicStyles.paymentCard}>
               <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                 <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Payment Information</Text>
@@ -204,50 +228,29 @@ export default function Account() {
 
             </View>
 
-            <View style={dynamicStyles.addressCard}>
-              <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-                <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Billing & Shipping Address</Text>
-              </View>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                <View style={{ width: '50%', marginRight: 10 }}>
-                  <MapLocation height={150} borderRadius={10} onAddressRetrieved={handleAddressRetrieved} />
-                </View>
-                <View style={{ flex: 1, marginLeft: 5 }}>
-                  <Text style={[dynamicStyles.text]}>{address || "Address"}</Text>
-                  <TouchableOpacity>
-                    <Text style={[dynamicStyles.text]}>Using your location</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity>
-                    <Text style={[dynamicStyles.text]}>Change {">"}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-
+            {/* Support Section */}
             <View style={dynamicStyles.supportCard}>
               <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                 <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Support</Text>
               </View>
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10, padding: 10 }}>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
                 <MaterialIcons name="report-gmailerrorred" size={24} color={dynamicStyles.text.color} />
-                <Text style={[dynamicStyles.text]}>Contact us</Text>
+                <Text style={dynamicStyles.text}>Contact us</Text>
               </TouchableOpacity>
               <View style={dynamicStyles.divider} />
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10, padding: 10 }}>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
                 <Ionicons name="settings-outline" size={24} color={dynamicStyles.text.color} />
-                <Text style={[dynamicStyles.text]}>Setting</Text>
+                <Text style={dynamicStyles.text}>Setting</Text>
               </TouchableOpacity>
               <View style={dynamicStyles.divider} />
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10, padding: 10 }}
-                onPress={handleLogout}>
+              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }} onPress={handleLogout}>
                 <MaterialIcons name="logout" size={24} color={dynamicStyles.text.color} />
-                <Text style={[dynamicStyles.text]}>Log out</Text>
+                <Text style={dynamicStyles.text}>Log out</Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
       </SafeAreaView>
-
     </GestureHandlerRootView>
   );
 }
