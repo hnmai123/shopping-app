@@ -1,6 +1,6 @@
 import { StyleSheet, View, Text, SafeAreaView, TextInput, Image, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
-import { doc, getDocs, collection } from 'firebase/firestore';
+import { doc, getDocs, collection, onSnapshot } from 'firebase/firestore';
 import { getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db, auth } from '../../firebase/firebaseConfig';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -38,33 +38,31 @@ export default function HomeScreen() {
 
   useEffect(() => {
     setIsLoading(true);
-    const fetchData = async () => {
-      try {
-        const colref = collection(db, 'products');
-        const snapshot = await getDocs(colref);
-        const fetchedData = snapshot.docs.map((doc) => {
-          const docData = doc.data();
-          return {
-            id: doc.id,
-            category: docData.category,
-            description: docData.description,
-            image: docData.image,
-            name: docData.name,
-            price: docData.price,
-            seller: docData.seller,
-          };
-        });
-        setData(fetchedData);
-        setFullData(fetchedData);
-        setIsLoading(false);
-      } catch (err) {
-        console.error('Error fetching data:', err);
-        setIsLoading(false);
-        setError('Failed to fetch data');
-      }
-    };
-
-    fetchData();
+    const colref = collection(db, 'products');
+  
+    const unsubscribe = onSnapshot(colref, (snapshot) => {
+      const fetchedData = snapshot.docs.map((doc) => {
+        const docData = doc.data();
+        return {
+          id: doc.id,
+          category: docData.category,
+          description: docData.description,
+          image: docData.image,
+          name: docData.name,
+          price: docData.price,
+          seller: docData.seller,
+        };
+      });
+      setData(fetchedData);
+      setFullData(fetchedData);
+      setIsLoading(false);
+    }, (err) => {
+      console.error('Error fetching data:', err);
+      setError('Failed to fetch data');
+      setIsLoading(false);
+    });
+  
+    return () => unsubscribe(); // Cleanup
   }, []);
 
   const handleSearch = (query: string) => {

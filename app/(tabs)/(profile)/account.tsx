@@ -24,7 +24,6 @@ import { useCart } from '@/context/CartContext';
 import { useAddress } from '@/context/AddressContext';
 import * as Location from 'expo-location';
 
-// Types for navigation route
 interface User {
   nickname?: string;
   name?: string;
@@ -173,7 +172,7 @@ export default function Account() {
       <SafeAreaView style={[styles.container, dynamicStyles.container]}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}>
           <View style={[styles.header, dynamicStyles.header]}>
-            <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.navigate('supplier' as never)}>
+            <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.navigate('(supplier)' as never)}>
               <MaterialCommunityIcons name="store-edit-outline" size={30} color={dynamicStyles.text.color} />
             </TouchableOpacity>
             <Text style={[{ fontSize: 40, fontWeight: 'bold' }, dynamicStyles.text]}>Account</Text>

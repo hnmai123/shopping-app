@@ -1,28 +1,20 @@
 import { Stack } from 'expo-router';
 import React from 'react';
 
-export default function ProfileLayout() {
+export default function SupplierLayout() {
     return (
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen
-                name="account"
-                options={{
-                    title: 'Profile',
-                    headerShown: false,
-                }}
-            />
-            <Stack.Screen
-                name ="(supplier)"
+                name="supplier"
                 options={{
                     title: 'Supplier',
                     headerShown: false,
-                    // Removed tabBarStyle as it is not valid for Stack.Screen
                 }}
             />
             <Stack.Screen
-                name="map"
+                name="addProduct"
                 options={{
-                    title: 'Map',
+                    title: 'addProduct',
                     presentation: 'modal',
                     headerShown: false,
                 }}

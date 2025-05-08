@@ -1,40 +1,48 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import React from "react";
 import { SafeAreaView, StyleSheet, TouchableOpacity, Text, View, Image, Touchable, ScrollView } from "react-native";
-import { useTheme } from '../../../context/ThemeContext';
+import { useTheme } from '../../../../context/ThemeContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { auth } from "@/firebase/firebaseConfig";
+import { auth, db } from "@/firebase/firebaseConfig";
 import { useState, useEffect } from "react";
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { doc, getDoc } from "firebase/firestore";
 
+interface User {
+    nickname?: string;
+    name?: string;
+    email?: string;
+    points?: number;
+    address?: string;
+    coords?: {
+      latitude: number;
+      longitude: number;
+    };
+  }
 
 export default function Supplier() {
     const { theme, toggleTheme, isDarkMode } = useTheme();
-    const [user, setUser] = useState(null);
-    const [address, setAddress] = useState('');
-    const [coords, setCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [user, setUser] = useState<User | undefined>(undefined);
     const navigation = useNavigation();
 
-    const handleAddressRetrieved = (addr: string | null, location: { latitude: number; longitude: number } | null) => {
-        setAddress(addr || '');
-        setCoords(location || null);
-    };
 
     useEffect(() => {
-        const currentUser = auth.currentUser;
-        if (currentUser) {
+        const fetchUser = async () => {
+          const currentUser = auth.currentUser;
+          if (currentUser) {
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+              const userData = userSnap.data();
+              setUser(userData);
+            }
+          }
+        };
+      
+        fetchUser();
+      }, []);
 
-        }
-    }, []);
-    const handleLogout = async () => {
-        try {
-            await auth.signOut(); // Firebase sign-out
-            navigation.navigate("(auth)" as never); // Navigate to the Login screen after logout
-        } catch (error) {
-            console.error("Error logging out:", error);
-        }
-    };
 
     const dynamicStyles = StyleSheet.create({
         container: {
@@ -147,9 +155,9 @@ export default function Supplier() {
                             <Text style={dynamicStyles.text}>Nickname</Text>
                         </View>
                         <View style={{ flex: 1, marginLeft: 20 }}>
-                            <Text style={dynamicStyles.text}>Username</Text>
-                            <Text style={dynamicStyles.text}>Role</Text>
-                            <Text style={dynamicStyles.text}>Email</Text>
+                            <Text style={dynamicStyles.text}>{user?.name || 'Name'}</Text>
+                            <Text style={dynamicStyles.text}>Role: Manager</Text>
+                            <Text style={dynamicStyles.text}>{user?.email || "Email"}</Text>
                         </View>
                     </View>
                     <View style={dynamicStyles.managementCard}>
@@ -178,14 +186,7 @@ export default function Supplier() {
                             </TouchableOpacity>
                         </View>
                     </View>
-                    <View style={dynamicStyles.managementCard}>
-                        <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10, justifyContent: 'space-between', flexDirection: 'row' }}>
-                            <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Add Product</Text>
-                            <TouchableOpacity>
-                                <Text style={[dynamicStyles.text, {fontSize: 14 }]}>Upload new item {">"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+
                     <View style={dynamicStyles.managementCard}>
                         <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                             <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Data Analytics</Text>
@@ -215,6 +216,16 @@ export default function Supplier() {
                                 <Text style={[dynamicStyles.text]}>View {">"}</Text>
                             </TouchableOpacity>
                         </View>
+                    </View>
+
+                    <View style={dynamicStyles.managementCard}>
+                        <TouchableOpacity style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderRadius: 10, justifyContent: 'space-between', flexDirection: 'row' }}
+                            onPress={() => navigation.navigate('addProduct' as never)}>
+                            <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Add Product</Text>
+                            <TouchableOpacity onPress={() => navigation.navigate('addProduct' as never)}>
+                                <Text style={[dynamicStyles.text, {fontSize: 14 }]}>Upload new item {">"}</Text>
+                            </TouchableOpacity>
+                        </TouchableOpacity>
                     </View>
                 </View>
 
