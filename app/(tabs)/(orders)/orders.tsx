@@ -7,6 +7,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { db } from '@/firebase/firebaseConfig';
 import { collection, getDocs } from 'firebase/firestore';
 import { useTheme } from '../../../context/ThemeContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // currently have hardcoded order numbers and details with products and everything.
 
@@ -58,13 +59,13 @@ const PreviousOrder = () => {
 
   const dynamicStyles = StyleSheet.create({
     text: {
-      color: Colors[colorScheme ?? 'light'].text,
+      color: isDarkMode ? '#FFFFFF' : 'black',
     },
     secondaryText: {
-      color: Colors[colorScheme ?? 'light'].secondary,
+      color: isDarkMode ? '#777' : '#555',
     },
     card: {
-      backgroundColor: Colors[colorScheme ?? 'light'].card,
+      backgroundColor: isDarkMode ? '#1E1E1E' : 'white',
     },
   });
 
@@ -184,7 +185,7 @@ const FeedbackSection = () => {
       color: Colors[colorScheme ?? 'light'].text,
     },
     feedbackBar: {
-      backgroundColor: Colors[colorScheme ?? 'light'].card,
+      backgroundColor: isDarkMode ? '#1E1E1E' : 'white',
     },
   });
 
@@ -227,8 +228,7 @@ export default function OrdersScreen() {
   });
 
   return (
-    <View style={[styles.container, dynamicStyles.container]}>
-      {/* header */}
+    <SafeAreaView style={[styles.container, dynamicStyles.container]}>
       <View style={[styles.header, dynamicStyles.header]}>
         <View style={styles.titleContainer}>
           <Text style={[styles.headerText, dynamicStyles.text]}>
@@ -249,7 +249,7 @@ export default function OrdersScreen() {
         <PreviousOrder />
         <FeedbackSection />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -11,6 +11,14 @@ export default function ProfileLayout() {
                     headerShown: false,
                 }}
             />
+            <Stack.Screen
+                name ="supplier"
+                options={{
+                    title: 'Supplier',
+                    headerShown: false,
+                    // Removed tabBarStyle as it is not valid for Stack.Screen
+                }}
+            />
         </Stack>
     );
 }

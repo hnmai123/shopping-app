@@ -10,6 +10,7 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MapLocation from '@/components/MapLocation';
 import { useNavigation } from '@react-navigation/native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export default function Account() {
   const { theme, toggleTheme, isDarkMode } = useTheme();
@@ -113,8 +114,8 @@ export default function Account() {
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}>
 
           <View style={[styles.header, dynamicStyles.header]}>
-            <TouchableOpacity style={{ marginLeft: "7%" }}>
-              <Text style={[{ fontSize: 22 }, dynamicStyles.text]}>Edit</Text>
+            <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.navigate('supplier' as never)}>
+            <MaterialCommunityIcons name="store-edit-outline" size={30} color={dynamicStyles.text.color} />
             </TouchableOpacity>
             <Text style={[{ fontSize: 40, fontWeight: 'bold' }, , dynamicStyles.text]}>Account</Text>
             <TouchableOpacity style={{ marginRight: "7%" }} onPress={toggleTheme}>
