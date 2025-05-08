@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { CartProvider } from '../context/CartContext';
 import React from 'react';
 import { ThemeProvider } from '../context/ThemeContext';
+import { AddressProvider } from '@/context/AddressContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,15 +32,17 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <CartProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          {isLoggedIn ? (
-            <Stack.Screen name="(tabs)" />
-          ) : (
-            <Stack.Screen name="(auth)" />
-          )}
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
+        <AddressProvider>
+          <Stack screenOptions={{ headerShown: false }}>
+            {isLoggedIn ? (
+              <Stack.Screen name="(tabs)" />
+            ) : (
+              <Stack.Screen name="(auth)" />
+            )}
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </AddressProvider>
       </CartProvider>
     </ThemeProvider>
   );

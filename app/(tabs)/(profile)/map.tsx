@@ -5,17 +5,16 @@ import * as Location from 'expo-location';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useTheme } from '@/context/ThemeContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
-type MapPickerRouteParams = {
-  onLocationSelected: (location: { latitude: number; longitude: number }, address: string) => void;
-};
+import { useAddress } from '@/context/AddressContext';
+import { doc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '@/firebase/firebaseConfig';
 
 export default function MapPicker() {
-  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [address, setAddress] = useState<string>('Fetching address...');
+  const { coords, setCoords, setAddress: setGlobalAddress } = useAddress();
+  const [location, setLocation] = useState(coords);
+  const [address, setAddress] = useState('Fetching address...');
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
-  const route = useRoute();
   const { isDarkMode, toggleTheme } = useTheme();
 
 //   const { onLocationSelected } = route.params as MapPickerRouteParams;
@@ -23,17 +22,6 @@ export default function MapPicker() {
   useEffect(() => {
     (async () => {
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert("Permission denied", "Please enable location access.");
-          return;
-        }
-
-        const current = await Location.getCurrentPositionAsync({});
-        const coords = {
-          latitude: current.coords.latitude,
-          longitude: current.coords.longitude,
-        };
         setLocation(coords);
         await reverseGeocode(coords);
         setLoading(false);
@@ -50,8 +38,10 @@ export default function MapPicker() {
       const { street, city, region, postalCode, country } = geo[0];
       const formatted = `${street || ''}, ${city || ''}, ${region || ''} ${postalCode || ''}, ${country || ''}`.trim();
       setAddress(formatted);
+      setGlobalAddress(formatted);
     } else {
       setAddress("Unknown location");
+      setGlobalAddress("Unknown location");
     }
   };
 
@@ -61,9 +51,18 @@ export default function MapPicker() {
     await reverseGeocode(coords);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (location) {
-    //   onLocationSelected(location, address);
+      setCoords(location);
+      setGlobalAddress(address);
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          address,
+          coords: location,
+        });
+      }      
       navigation.goBack();
     }
   };

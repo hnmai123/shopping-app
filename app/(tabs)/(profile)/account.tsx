@@ -19,8 +19,10 @@ import MapComponent from '@/components/Map';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { db, auth } from '@/firebase/firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useCart } from '@/context/CartContext';
+import { useAddress } from '@/context/AddressContext';
+import * as Location from 'expo-location';
 
 // Types for navigation route
 interface User {
@@ -28,25 +30,20 @@ interface User {
   name?: string;
   email?: string;
   points?: number;
+  address?: string;
+  coords?: {
+    latitude: number;
+    longitude: number;
+  };
 }
-
-type RootStackParamList = {
-  account: { location?: { latitude: number; longitude: number }; address?: string };
-  map: undefined;
-};
 
 export default function Account() {
   const { theme, toggleTheme, isDarkMode } = useTheme();
   const { updateCart } = useCart();
   const navigation = useNavigation();
-  const route = useRoute<RouteProp<RootStackParamList, 'account'>>();
 
   const [user, setUser] = useState<User | null>(null);
-  const [address, setAddress] = useState('');
-  const [coords, setCoords] = useState({
-    latitude: -33.8688,
-    longitude: 151.2093,
-  });
+  const { address, coords, setAddress: setGlobalAddress, setCoords: setGlobalCoords } = useAddress();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -55,24 +52,28 @@ export default function Account() {
         const userData = doc(db, 'users', currentUser.uid);
         const userSnap = await getDoc(userData);
         if (userSnap.exists()) {
-          setUser(userSnap.data());
+          const userData = userSnap.data();
+          setUser(userData);
+          if (userData.coords) {
+            setGlobalCoords(userData.coords);
+          }
+          if (userData.address) {
+            setGlobalAddress(userData.address)
+          }
         }
       }
     };
     fetchUserProfile();
   }, []);
 
-  // Apply new location if returned from Map screen
-  useEffect(() => {
-    if (route.params?.location && route.params?.address) {
-      setCoords(route.params.location);
-      setAddress(route.params.address);
-    }
-  }, [route.params]);
-
   const handleLogout = async () => {
     try {
       updateCart([]);
+      setGlobalAddress(''); // Reset address
+      setGlobalCoords({
+      latitude: -33.8688,
+      longitude: 151.2093,
+    });
       await auth.signOut();
       navigation.navigate('(auth)' as never);
     } catch (error) {
@@ -80,6 +81,42 @@ export default function Account() {
     }
   };
 
+  const handleCurrentLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      const geo = await Location.reverseGeocodeAsync(location.coords);
+      let formattedAddress = 'Unknown location';
+      if (geo.length > 0) {
+        const { street, city, region, postalCode, country } = geo[0];
+        formattedAddress = `${street || ''}, ${city || ''}, ${region || ''} ${postalCode || ''}, ${country || ''}`.trim();
+      }
+      setGlobalCoords({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+      setGlobalAddress(formattedAddress);
+
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          address: formattedAddress,
+          coords: {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          },
+        });
+      }
+
+    } catch (error) {
+      console.error("Error fetching current location:", error);
+    }
+  };
   const dynamicStyles = StyleSheet.create({
     container: {
       backgroundColor: isDarkMode ? '#121212' : '#61EDFF',
@@ -174,9 +211,9 @@ export default function Account() {
                 <TouchableOpacity style={{ width: '50%', marginRight: 10 }} onPress={() => navigation.navigate('map' as never)}>
                   <MapComponent initialLocation={coords} selectable={false} height={150} />
                 </TouchableOpacity>
-                <View style={{ flex: 1, marginLeft: 5 }}>
+                <View style={{ flex: 1, margin: 5, gap: 10 }}>
                   <Text style={dynamicStyles.text}>{address || "Address"}</Text>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={handleCurrentLocation}>
                     <Text style={dynamicStyles.text}>Using your location</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => navigation.navigate('map' as never)}>
@@ -225,7 +262,6 @@ export default function Account() {
                 </View>
                 <Text style={dynamicStyles.text}>$100</Text>
               </View>
-
             </View>
 
             {/* Support Section */}
@@ -234,17 +270,17 @@ export default function Account() {
                 <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Support</Text>
               </View>
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
-                <MaterialIcons name="report-gmailerrorred" size={24} color={dynamicStyles.text.color} />
+                <MaterialIcons name="report-gmailerrorred" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
                 <Text style={dynamicStyles.text}>Contact us</Text>
               </TouchableOpacity>
               <View style={dynamicStyles.divider} />
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
-                <Ionicons name="settings-outline" size={24} color={dynamicStyles.text.color} />
+                <Ionicons name="settings-outline" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
                 <Text style={dynamicStyles.text}>Setting</Text>
               </TouchableOpacity>
               <View style={dynamicStyles.divider} />
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }} onPress={handleLogout}>
-                <MaterialIcons name="logout" size={24} color={dynamicStyles.text.color} />
+                <MaterialIcons name="logout" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
                 <Text style={dynamicStyles.text}>Log out</Text>
               </TouchableOpacity>
             </View>

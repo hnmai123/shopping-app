@@ -6,7 +6,6 @@ type Props = {
   initialLocation: { latitude: number; longitude: number };
   onLocationChange?: (location: { latitude: number; longitude: number }) => void;
   selectable?: boolean;
-  markerTitle?: string;
   height?: number;
 };
 
@@ -14,13 +13,11 @@ export default function MapComponent({
   initialLocation,
   onLocationChange,
   selectable = false,
-  markerTitle = 'Selected Location',
   height,
 }: Props) {
   const handleMapPress = (event: MapPressEvent) => {
     if (selectable && onLocationChange) {
-      const { coordinate } = event.nativeEvent;
-      onLocationChange(coordinate);
+      onLocationChange(event.nativeEvent.coordinate);
     }
   };
 
@@ -28,14 +25,22 @@ export default function MapComponent({
     <View style={[styles.container, height ? { height } : null]}>
       <MapView
         style={StyleSheet.absoluteFillObject}
-        initialRegion={{
+        region={{
           ...initialLocation,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         }}
         onPress={handleMapPress}
       >
-        <Marker coordinate={initialLocation} title={markerTitle} />
+        <Marker
+          coordinate={initialLocation}
+          draggable={selectable}
+          onDragEnd={(e) => {
+            if (selectable && onLocationChange) {
+              onLocationChange(e.nativeEvent.coordinate);
+            }
+          }}
+        />
       </MapView>
     </View>
   );
@@ -43,8 +48,7 @@ export default function MapComponent({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // ✅ let the parent control the height unless overridden
-    borderRadius: 10,
+    flex: 1,
     overflow: 'hidden',
   },
 });
