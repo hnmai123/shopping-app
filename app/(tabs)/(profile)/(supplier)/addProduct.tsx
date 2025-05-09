@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Alert, SafeAreaView, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { auth, db, storage } from '@/firebase/firebaseConfig';
-import { doc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useTheme } from '@/context/ThemeContext';
-import { useNavigation } from 'expo-router';
+import { auth, db, storage } from '@/firebase/firebaseConfig';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as ImagePicker from 'expo-image-picker';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { useNavigation } from 'expo-router';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import React, { useState } from 'react';
+import { Alert, Image, Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 
 export default function AddProduct() {
     const [productName, setProductName] = useState('');
@@ -124,19 +124,20 @@ export default function AddProduct() {
     };
 
     return (
-        <SafeAreaView style={[styles.safeArea, { backgroundColor: isDarkMode ? '#121212' : '#ffffff' }]}>
-            
-            <View style={[styles.header, { backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF' }]}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <MaterialIcons name="arrow-back" size={28} color={isDarkMode ? 'white' : 'black'} />
-                </TouchableOpacity>
-                <Text style={[styles.headerText, { color: isDarkMode ? 'white' : 'black' }]}>Upload your product</Text>
-                <TouchableOpacity onPress={toggleTheme}>
-                    <MaterialIcons name={isDarkMode ? 'wb-sunny' : 'dark-mode'} size={24} color={isDarkMode ? '#FFD700' : 'black'} />
-                </TouchableOpacity>
-            </View>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <SafeAreaView style={[styles.safeArea, { backgroundColor: isDarkMode ? '#121212' : '#ffffff' }]}>
 
-            {uploading && (
+                <View style={[styles.header, { backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF' }]}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <MaterialIcons name="arrow-back" size={28} color={isDarkMode ? 'white' : 'black'} />
+                    </TouchableOpacity>
+                    <Text style={[styles.headerText, { color: isDarkMode ? 'white' : 'black' }]}>Upload your product</Text>
+                    <TouchableOpacity onPress={toggleTheme}>
+                        <MaterialIcons name={isDarkMode ? 'wb-sunny' : 'dark-mode'} size={24} color={isDarkMode ? '#FFD700' : 'black'} />
+                    </TouchableOpacity>
+                </View>
+
+                {uploading && (
                     <View style={{ marginTop: 10, width: '90%', alignSelf: 'center', backgroundColor: isDarkMode ? '#2c2c2c' : '#eee', borderRadius: 4 }}>
                         <View
                             style={{
@@ -148,67 +149,70 @@ export default function AddProduct() {
                         />
                     </View>
                 )}
-                
-            <View style={styles.container}>
-                <Text style={[styles.label, { color: isDarkMode ? '#ffffff' : '#000000' }]}>Product Name</Text>
-                <TextInput
-                    value={productName}
-                    onChangeText={setProductName}
-                    style={[styles.input, { backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', color: isDarkMode ? '#fff' : '#000' }]}
-                    placeholder="Enter product name"
-                    placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
-                    autoCapitalize='none'
-                />
 
-                <Text style={[styles.label, { color: isDarkMode ? '#ffffff' : '#000000' }]}>Price</Text>
-                <TextInput
-                    value={price}
-                    onChangeText={setPrice}
-                    keyboardType="numeric"
-                    style={[styles.input, { backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', color: isDarkMode ? '#fff' : '#000' }]}
-                    placeholder="Enter price"
-                    placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
-                    autoCapitalize='none'
-                />
+                <View style={styles.container}>
+                    <Text style={[styles.label, { color: isDarkMode ? '#ffffff' : '#000000' }]}>Product Name</Text>
+                    <TextInput
+                        value={productName}
+                        onChangeText={setProductName}
+                        style={[styles.input, { backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', color: isDarkMode ? '#fff' : '#000' }]}
+                        placeholder="Enter product name"
+                        placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
+                        autoCapitalize='none'
+                    />
 
-                <Text style={[styles.label, { color: isDarkMode ? '#ffffff' : '#000000' }]}>Category</Text>
-                <TextInput
-                    value={category}
-                    onChangeText={setCategory}
-                    style={[styles.input, { backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', color: isDarkMode ? '#fff' : '#000' }]}
-                    placeholder="Enter category"
-                    placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
-                    autoCapitalize='none'
-                />
+                    <Text style={[styles.label, { color: isDarkMode ? '#ffffff' : '#000000' }]}>Price</Text>
+                    <TextInput
+                        value={price}
+                        onChangeText={setPrice}
+                        keyboardType="numeric"
+                        style={[styles.input, { backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', color: isDarkMode ? '#fff' : '#000' }]}
+                        placeholder="Enter price"
+                        placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
+                        autoCapitalize='none'
+                    />
 
-                <Text style={[styles.label, { color: isDarkMode ? '#ffffff' : '#000000' }]}>Description</Text>
-                <TextInput
-                    value={description}
-                    onChangeText={setDescription}
-                    style={[styles.input, { height: 80, backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', color: isDarkMode ? '#fff' : '#000' }]}
-                    multiline
-                    placeholder="Enter description"
-                    placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
-                    autoCapitalize='none'
-                />
-                <View>
-                    <TouchableOpacity style={[styles.confirmButton, { backgroundColor: isDarkMode ? '#00B1BA' : '#999' }]} onPress={takePhoto}>
-                        <Text style={{ color: isDarkMode ? 'white' : 'black', fontWeight: 'bold' }}>{imageUrl ? "Retake Image" : "Take Product Photo"}</Text>
+                    <Text style={[styles.label, { color: isDarkMode ? '#ffffff' : '#000000' }]}>Category</Text>
+                    <TextInput
+                        value={category}
+                        onChangeText={setCategory}
+                        style={[styles.input, { backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', color: isDarkMode ? '#fff' : '#000' }]}
+                        placeholder="Enter category"
+                        placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
+                        autoCapitalize='none'
+                    />
+
+                    <Text style={[styles.label, { color: isDarkMode ? '#ffffff' : '#000000' }]}>Description</Text>
+                    <TextInput
+                        value={description}
+                        onChangeText={setDescription}
+                        style={[styles.input, { height: 80, backgroundColor: isDarkMode ? '#2c2c2c' : '#ffffff', color: isDarkMode ? '#fff' : '#000' }]}
+                        placeholder="Enter description"
+                        placeholderTextColor={isDarkMode ? '#888' : '#aaa'}
+                        autoCapitalize='none'
+                        multiline
+                        textAlignVertical="top"
+
+                    />
+                    <View>
+                        <TouchableOpacity style={[styles.confirmButton, { backgroundColor: isDarkMode ? '#00B1BA' : '#999' }]} onPress={takePhoto}>
+                            <Text style={{ color: isDarkMode ? 'white' : 'black', fontWeight: 'bold' }}>{imageUrl ? "Retake Image" : "Take Product Photo"}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[styles.confirmButton, { backgroundColor: isDarkMode ? '#00B1BA' : '#999' }]} onPress={pickImage}>
+                            <Text style={{ color: isDarkMode ? 'white' : 'black', fontWeight: 'bold' }}>Choose from Gallery</Text>
+                        </TouchableOpacity>
+                        {imageUrl && (
+                            <Image source={{ uri: imageUrl }} style={{ height: 200, width: '100%', marginTop: 10, borderRadius: 8 }} />
+                        )}
+                    </View>
+
+
+                    <TouchableOpacity onPress={handleAddProduct} style={styles.confirmButton}>
+                        <Text style={{ color: isDarkMode ? 'white' : 'black', fontWeight: 'bold' }}>Add Product</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.confirmButton, { backgroundColor: isDarkMode ? '#00B1BA' : '#999' }]} onPress={pickImage}>
-                        <Text style={{ color: isDarkMode ? 'white' : 'black', fontWeight: 'bold' }}>Choose from Gallery</Text>
-                    </TouchableOpacity>
-                    {imageUrl && (
-                        <Image source={{ uri: imageUrl }} style={{ height: 200, width: '100%', marginTop: 10, borderRadius: 8 }} />
-                    )}
                 </View>
-
-
-                <TouchableOpacity onPress={handleAddProduct} style={styles.confirmButton}>
-                    <Text style={{ color: isDarkMode ? 'white' : 'black', fontWeight: 'bold' }}>Add Product</Text>
-                </TouchableOpacity>
-            </View>
-        </SafeAreaView>
+            </SafeAreaView>
+        </TouchableWithoutFeedback>
     );
 }
 

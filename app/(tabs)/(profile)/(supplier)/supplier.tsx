@@ -1,13 +1,12 @@
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import React from "react";
-import { SafeAreaView, StyleSheet, TouchableOpacity, Text, View, Image, Touchable, ScrollView } from "react-native";
-import { useTheme } from '../../../../context/ThemeContext';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { auth, db } from "@/firebase/firebaseConfig";
-import { useState, useEffect } from "react";
-import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { useTheme } from '../../../../context/ThemeContext';
 
 interface User {
     nickname?: string;
@@ -133,7 +132,7 @@ export default function Supplier() {
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={[styles.container, dynamicStyles.container]}>
                 <View style={[styles.header, dynamicStyles.header]}>
-                    <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.navigate('account' as never)}>
+                    <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.goBack()}>
                         <Ionicons size={30} name="person-outline" color={dynamicStyles.text.color} />
                     </TouchableOpacity>
                     <Text style={[{ fontSize: 30, fontWeight: 'bold' }, , dynamicStyles.text]}>Management</Text>
