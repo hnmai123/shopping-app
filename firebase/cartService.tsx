@@ -1,5 +1,5 @@
-import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db, auth } from "../firebase/firebaseConfig";
+import { deleteDoc, doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/firebaseConfig";
 
 export const syncCartToFirestore = async (cartItems: any[]) => {
     const user = auth.currentUser;
@@ -29,10 +29,15 @@ export const deleteItemFromFirestore = async (productId: string) => {
 
     const cartData = cartSnap.data();
     const filteredItems = cartData.items.filter((item: any) => item.id !== productId);
-    await updateDoc(cartRef, {
-        items: filteredItems,
-        updatedAt: serverTimestamp(),
-    });
+    if (filteredItems.length === 0) {
+        await deleteDoc(cartRef);
+        return;
+    } else {
+        await updateDoc(cartRef, {
+            items: filteredItems,
+            updatedAt: serverTimestamp(),
+        });
+    }
 };
 
 export const fetchProductDetails = async (productId: string) => {

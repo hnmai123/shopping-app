@@ -40,7 +40,7 @@ export default function TabLayout() {
         }}
         />
       <Tabs.Screen
-        name="(orders)"
+        name="orders"
         options={{
           title: 'Orders',
           tabBarIcon: ({ color }) => <Ionicons size={28} name="bag-check-outline" color={color} />,

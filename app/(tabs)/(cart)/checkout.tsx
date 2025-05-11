@@ -1,12 +1,18 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
-import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
+import { useCart } from '@/context/CartContext';
+import { auth, db } from '@/firebase/firebaseConfig';
+import { createOrder } from '@/firebase/orderService';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React from 'react';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { deleteDoc, doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import { useTheme } from '../../../context/ThemeContext';
 
 export default function CheckoutScreen() {
+    const {updateCart} = useCart();
+
     type RootStackParamList = {
         checkout: { cart: any[]; cartCount: number; totalAmount: number };
     };
@@ -27,6 +33,34 @@ export default function CheckoutScreen() {
     const route = useRoute<CheckoutScreenRouteProp>();
     const { cart, cartCount, totalAmount } = route.params;
     const { theme, toggleTheme, isDarkMode } = useTheme();
+
+    const fetchSellerName = async (sellerId: string) : Promise<string> => {
+            try {
+                const sellerDoc = await getDoc(doc(db, 'users', sellerId));
+                if (sellerDoc.exists()) {
+                    const sellerData = sellerDoc.data();
+                    return sellerData?.name || 'Seller';
+                }
+            } catch (error) {
+                console.error("Error fetching seller name:", error);
+            }
+            return "Seller";
+        }
+        const [cartWithSellerNames, setCartWithSellerNames] = useState<any[]>([]);
+    
+        useEffect(() => {
+            const fetchSellerNames = async () => {
+                const updatedCart = await Promise.all(
+                    cart.map(async (item: any) => {
+                        const sellerName = await fetchSellerName(item.seller); // Fetch seller name
+                        return { ...item, sellerName }; // Add sellerName to the cart item
+                    })
+                );
+                setCartWithSellerNames(updatedCart); // Update state with cart items including seller names
+            };
+    
+            fetchSellerNames();
+        }, [cart]); // Re-run if the cart changes
 
     const dynamicStyles = StyleSheet.create({
         container: {
@@ -58,6 +92,31 @@ export default function CheckoutScreen() {
         }
     });
 
+    const handleCheckout = async () => {
+        try {
+            const user = auth.currentUser;
+            if (!user) throw new Error("User not authenticated");
+
+            const userRef = doc(db, 'users', user.uid);
+            const userSnapshot = await getDoc(userRef);
+
+            if (!userSnapshot.exists()) throw new Error("User document does not exist");
+            const userData = userSnapshot.data();
+            const address = userData.address || "Default Address";
+            const coords = userData.coords || { latitude: 0, longitude: 0 };
+
+            const orderId = await createOrder(cart, totalAmount, address, coords);
+            Alert.alert("Order placed successfully");
+            const cartRef = doc(db, 'carts', user.uid);
+            await deleteDoc(cartRef);
+            updateCart([]);
+            navigation.goBack();
+        } catch (error) {
+            console.error("Error placing order:", error);
+            Alert.alert("Error", "Failed to place order. Please try again.");
+        }
+    }
+
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={[styles.container, dynamicStyles.container]}>
@@ -78,13 +137,13 @@ export default function CheckoutScreen() {
                 </View>
                 <View style={[styles.cartContainer, dynamicStyles.container]}>
                     <FlatList
-                        data={cart}
+                        data={cartWithSellerNames}
                         keyExtractor={(item) => item.id}
                         renderItem={({ item }) => (
                             <View style={[styles.productCard, dynamicStyles.card]}>
                                 <View style={[styles.cardHeader, dynamicStyles.cardHeader]}>
                                     <Ionicons name="storefront-outline" size={24} color={dynamicStyles.icon.color} style={{ position: 'absolute', left: "2%" }} />
-                                    <Text style={[dynamicStyles.text, { fontSize: 22 }]}>{item.seller}</Text>
+                                    <Text style={[dynamicStyles.text, { fontSize: 22 }]}>{item.sellerName}</Text>
                                 </View>
                                 <View style={{ flexDirection: 'row', padding: 5 }}>
                                     <Image source={{ uri: item.image }} style={styles.productImage} />
@@ -131,9 +190,9 @@ export default function CheckoutScreen() {
                     </View>
                     <View style={styles.cartSummaryRow}>
                         <Text style={dynamicStyles.text}>Total Amount</Text>
-                        <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20 }]}>{formatter.format(totalAmount)}</Text>
-                        <TouchableOpacity style={[styles.placeOrderButton, dynamicStyles.button]}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white' }}>Place Order</Text>
+                        <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 17 }]}>{formatter.format(totalAmount)}</Text>
+                        <TouchableOpacity style={[styles.placeOrderButton, dynamicStyles.button]} onPress={handleCheckout}>
+                            <Text style={{ fontWeight: 'bold', fontSize: 17, color: 'white' }}>Place Order</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

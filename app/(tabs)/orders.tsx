@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, ScrollView } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
-import Ionicons from '@expo/vector-icons/Ionicons';
+import { useTheme } from '@/context/ThemeContext';
 import { db } from '@/firebase/firebaseConfig';
+import { useColorScheme } from '@/hooks/useColorScheme';
+import { MaterialIcons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { collection, getDocs } from 'firebase/firestore';
-import { useTheme } from '../../../context/ThemeContext';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // currently have hardcoded order numbers and details with products and everything.
