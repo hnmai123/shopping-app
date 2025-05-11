@@ -1,12 +1,14 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { SafeAreaView, View, Text, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
-import { RouteProp, useNavigation, useRoute, NavigationProp } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import React from 'react';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { NavigationProp, RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, GestureHandlerRootView } from "react-native-gesture-handler";
 import { useTheme } from '../../../context/ThemeContext';
 
 export default function CheckoutScreen() {
+    const [showNotification, setShowNotification] = useState(false); // Add notification state
+
     type RootStackParamList = {
         checkout: { cart: any[]; cartCount: number; totalAmount: number };
     };
@@ -55,7 +57,19 @@ export default function CheckoutScreen() {
         },
         icon: {
             color: isDarkMode ? '#FFFFFF' : 'black',
-        }
+        },
+        notificationBanner: {
+            position: 'absolute',
+            bottom: 20,
+            left: 20,
+            right: 20,
+            padding: 15,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            backgroundColor: isDarkMode ? '#00B1BA' : '#00B1BA',  // Make sure the background color is not red
+        },
     });
 
     return (
@@ -132,14 +146,33 @@ export default function CheckoutScreen() {
                     <View style={styles.cartSummaryRow}>
                         <Text style={dynamicStyles.text}>Total Amount</Text>
                         <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20 }]}>{formatter.format(totalAmount)}</Text>
-                        <TouchableOpacity style={[styles.placeOrderButton, dynamicStyles.button]}>
+                        <TouchableOpacity 
+                            style={[styles.placeOrderButton, dynamicStyles.button]} 
+                            onPress={() => {
+                                // Handle order placement logic here
+                                setShowNotification(true);
+                                
+                                // Show notification for 3 seconds
+                                setTimeout(() => {
+                                    setShowNotification(false);
+                                    navigation.navigate('orders' as never);
+                                }, 3000);
+                            }}
+                        >
                             <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white' }}>Place Order</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
+
+                {/* Notification Banner */}
+                {showNotification && (
+                    <View style={styles.notificationBanner}>
+                        <Text style={{ color: 'white', fontWeight: 'bold' }}>Your order has been placed successfully!</Text>
+                    </View>
+                )}
             </SafeAreaView>
         </GestureHandlerRootView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -202,5 +235,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 10
+    },
+    notificationBanner: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        right: 20,
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
+        backgroundColor: '#00B1BA',  // Ensure it’s not red
     }
 });

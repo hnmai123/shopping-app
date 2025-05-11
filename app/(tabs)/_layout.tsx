@@ -1,20 +1,19 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-import { StyleSheet } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Platform, StyleSheet } from 'react-native';
 
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '@/context/ThemeContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { isDarkMode } = useTheme();
 
-  return (
+   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: isDarkMode ? '#FFFFFF' : Colors.light.tint,
@@ -22,8 +21,8 @@ export default function TabLayout() {
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
         tabBarStyle: [
-          styles.tabBar, // Base styles
-          { backgroundColor: isDarkMode ? '#121212' : '#FFFFFF' }, // Dynamic background color
+          styles.tabBar,
+          { backgroundColor: isDarkMode ? '#121212' : '#FFFFFF' },
         ],
       }}>
       <Tabs.Screen
@@ -34,12 +33,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Notifications',
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="notifications-outline" color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="(cart)"
         options={{
           title: 'Cart',
           tabBarIcon: ({ color }) => <Ionicons size={28} name="cart-outline" color={color} />,
         }}
-        />
+      />
       <Tabs.Screen
         name="(orders)"
         options={{
@@ -60,8 +66,8 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    borderTopWidth: 0, // Remove border for a cleaner look
-    position: Platform.OS === 'ios' ? 'absolute' : 'relative', // Float on iOS
-    elevation: 5, // Add shadow on Android
+    borderTopWidth: 0,
+    position: Platform.OS === 'ios' ? 'absolute' : 'relative',
+    elevation: 5,
   },
 });
