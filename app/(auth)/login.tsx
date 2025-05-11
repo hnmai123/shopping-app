@@ -128,7 +128,7 @@ export default function LoginScreen() {
                   </TouchableOpacity>
                 </View>
                 {errorMessage ? (
-                  <Text style={{ color: 'red', fontSize: 14, margin: 10, width: '78%', alignSelf: 'center' }}>
+                  <Text style={{ color: 'red', fontSize: 14, margin: 10, width: '78%', textAlign: 'center' }}>
                     {errorMessage}
                   </Text>
                 ) : null}

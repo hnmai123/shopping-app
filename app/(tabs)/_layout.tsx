@@ -1,14 +1,13 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-import { StyleSheet } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Tabs } from 'expo-router';
+import React from 'react';
+import { Platform, StyleSheet } from 'react-native';
 
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '@/context/ThemeContext';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -23,7 +22,7 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: [
           styles.tabBar, // Base styles
-          { backgroundColor: isDarkMode ? '#121212' : '#FFFFFF' }, // Dynamic background color
+          { backgroundColor: isDarkMode ? '#121212' : '#FAFAFA' }, // Dynamic background color
         ],
       }}>
       <Tabs.Screen

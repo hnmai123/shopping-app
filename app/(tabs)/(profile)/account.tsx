@@ -1,28 +1,28 @@
 // Account.tsx (Fixed version)
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import MapComponent from '@/components/Map';
+import { useAddress } from '@/context/AddressContext';
+import { useCart } from '@/context/CartContext';
+import { auth, db } from '@/firebase/firebaseConfig';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import Fontisto from '@expo/vector-icons/Fontisto';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-  Text,
-  View,
   Image,
+  SafeAreaView,
   ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useTheme } from '../../../context/ThemeContext';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Fontisto from '@expo/vector-icons/Fontisto';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import MapComponent from '@/components/Map';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { db, auth } from '@/firebase/firebaseConfig';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { useCart } from '@/context/CartContext';
-import { useAddress } from '@/context/AddressContext';
-import * as Location from 'expo-location';
 
 interface User {
   nickname?: string;
@@ -213,7 +213,7 @@ export default function Account() {
                 <View style={{ flex: 1, margin: 5, gap: 10 }}>
                   <Text style={dynamicStyles.text}>{address || "Address"}</Text>
                   <TouchableOpacity onPress={handleCurrentLocation}>
-                    <Text style={dynamicStyles.text}>Using your location</Text>
+                    <Text style={[{ color: isDarkMode ? '#66B2FF' : '#007AFF' }]}>Using your location</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => navigation.navigate('map' as never)}>
                     <Text style={dynamicStyles.text}>Change {">"}</Text>

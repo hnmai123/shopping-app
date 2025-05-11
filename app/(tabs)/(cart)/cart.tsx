@@ -1,13 +1,15 @@
-import { SafeAreaView, StyleSheet, View, TouchableOpacity, Text, Image } from 'react-native';
-import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { deleteItemFromFirestore, syncCartToFirestore } from '@/firebase/cartService';
+import { db } from '@/firebase/firebaseConfig';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useCart } from '../../../context/CartContext';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import React from 'react';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { doc, getDoc } from "firebase/firestore"; // Import Firestore methods
+import React, { useEffect, useState } from 'react';
+import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useCart } from '../../../context/CartContext';
 import { useTheme } from '../../../context/ThemeContext';
-import { syncCartToFirestore, deleteItemFromFirestore } from '@/firebase/cartService';
 
 export default function Cart() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -24,6 +26,34 @@ export default function Cart() {
         currency: 'AUD',
     });
 
+    const fetchSellerName = async (sellerId: string) : Promise<string> => {
+        try {
+            const sellerDoc = await getDoc(doc(db, 'users', sellerId));
+            if (sellerDoc.exists()) {
+                const sellerData = sellerDoc.data();
+                return sellerData?.name || 'Seller';
+            }
+        } catch (error) {
+            console.error("Error fetching seller name:", error);
+        }
+        return "Seller";
+    }
+    const [cartWithSellerNames, setCartWithSellerNames] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchSellerNames = async () => {
+            const updatedCart = await Promise.all(
+                cart.map(async (item: any) => {
+                    const sellerName = await fetchSellerName(item.seller); // Fetch seller name
+                    return { ...item, sellerName }; // Add sellerName to the cart item
+                })
+            );
+            setCartWithSellerNames(updatedCart); // Update state with cart items including seller names
+        };
+
+        fetchSellerNames();
+    }, [cart]); // Re-run if the cart changes
+    
     const updateQuantity = async (item: any, action: string) => {
         const updatedCart = cart.map((cartItem: any) => {
             if (cartItem.id === item.id) {
@@ -104,13 +134,13 @@ export default function Cart() {
                     ) : (
                         <>
                             <FlatList
-                                data={cart}
+                                data={cartWithSellerNames}
                                 keyExtractor={(item) => item.id}
                                 renderItem={({ item }) => (
                                     <View style={[styles.productCard, dynamicStyles.card]}>
                                         <View style={[styles.cardHeader, dynamicStyles.cardHeader]}>
                                             <Ionicons name="storefront-outline" size={24} color={dynamicStyles.icon.color} />
-                                            <Text style={[dynamicStyles.text, { fontSize: 22, paddingLeft: 10 }]}>{item.seller}</Text>
+                                            <Text style={[dynamicStyles.text, { fontSize: 22, paddingLeft: 10 }]}>{item.sellerName}</Text>
                                             <TouchableOpacity style={{ paddingRight: 10 }} onPress={() => deleteItem(item)}>
                                                 <Text style={dynamicStyles.text}>Delete</Text>
                                             </TouchableOpacity>

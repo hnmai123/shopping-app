@@ -68,7 +68,7 @@ export default function HomeScreen() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     const formatterdquery = query.toLowerCase();
-    const filteredData = filter(fullData, (item) => {
+    const filteredData = filter(fullData, (item: { name: string; description: string; }) => {
       return contains(item, formatterdquery);
     })
     setData(filteredData);

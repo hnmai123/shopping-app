@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, SafeAreaView } from 'react-native';
 import MapComponent from '@/components/Map';
-import * as Location from 'expo-location';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { useTheme } from '@/context/ThemeContext';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useAddress } from '@/context/AddressContext';
-import { doc, updateDoc } from 'firebase/firestore';
+import { useTheme } from '@/context/ThemeContext';
 import { auth, db } from '@/firebase/firebaseConfig';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
+import { doc, updateDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function MapPicker() {
   const { coords, setCoords, setAddress: setGlobalAddress } = useAddress();

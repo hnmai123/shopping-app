@@ -202,7 +202,9 @@ export default function AddProduct() {
                             <Text style={{ color: isDarkMode ? 'white' : 'black', fontWeight: 'bold' }}>Choose from Gallery</Text>
                         </TouchableOpacity>
                         {imageUrl && (
-                            <Image source={{ uri: imageUrl }} style={{ height: 200, width: '100%', marginTop: 10, borderRadius: 8 }} />
+                            <Image source={{ uri: imageUrl }} 
+                            style={{ height: 200, width: '100%', marginTop: 10, borderRadius: 8, borderWidth: 1, borderColor: isDarkMode ? '#ffffff' : '#000'}} 
+                            resizeMode='contain'/>
                         )}
                     </View>
 
