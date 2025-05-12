@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as Location from 'expo-location';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Coordinates = {
   latitude: number;
@@ -26,13 +26,11 @@ export const AddressProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const fetchAddress = async () => {
       try {
-        const geo = await Location.reverseGeocodeAsync(coords);
-        if (geo.length > 0) {
-          const { street, city, region, postalCode, country } = geo[0];
-          const formatted = `${street || ''}, ${city || ''}, ${region || ''} ${postalCode || ''}, ${country || ''}`.trim();
-          setAddress(formatted);
-        } else {
-          setAddress('Unknown location');
+        const status = await Location.requestForegroundPermissionsAsync();
+        if (status.status !== 'granted') {
+          console.warn('Permission to access location was denied');
+          setAddress('Permission to access location was denied');
+          return;
         }
       } catch (error) {
         console.error('Reverse geocoding failed:', error);
