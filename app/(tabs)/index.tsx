@@ -1,15 +1,13 @@
-import { StyleSheet, View, Text, SafeAreaView, TextInput, Image, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
-import { useEffect, useState } from 'react';
-import { doc, getDocs, collection, onSnapshot } from 'firebase/firestore';
-import { getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db, auth } from '../../firebase/firebaseConfig';
-import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
-import filter from 'lodash.filter';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useCart } from '../../context/CartContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import React from 'react';
+import { collection, doc, getDoc, onSnapshot, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import filter from 'lodash.filter';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
+import { auth, db } from '../../firebase/firebaseConfig';
 
 export default function HomeScreen() {
   const { cart, updateCart } = useCart();
@@ -68,7 +66,7 @@ export default function HomeScreen() {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     const formatterdquery = query.toLowerCase();
-    const filteredData = filter(fullData, (item) => {
+    const filteredData = filter(fullData, (item:any) => {
       return contains(item, formatterdquery);
     })
     setData(filteredData);
