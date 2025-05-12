@@ -1,219 +1,52 @@
+// orders.tsx (Fixed background color below orders area)
 import { Colors } from '@/constants/Colors';
 import { useTheme } from '@/context/ThemeContext';
-import { db } from '@/firebase/firebaseConfig';
+import { auth, db } from '@/firebase/firebaseConfig';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
-// currently have hardcoded order numbers and details with products and everything.
+import {
+  ActivityIndicator,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 interface OrderItem {
   name: string;
   image: string;
   price: number;
-  originalPrice?: number;
-  deliveryDate?: string;
   quantity: number;
 }
 
-interface Order {
-  id: string;
-  orderId: string;
-  orderDate: string;
-  items: OrderItem[];
-  totalAmount: number;
-}
 
-const OrderStatusBar = () => {
-  const { isDarkMode } = useTheme();
-  return (
-    <View style={[styles.orderStatusBar, isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#F0F0F0' }]}>
-      <View style={styles.statusBarItem}>
-        <Ionicons name="clipboard-outline" size={24} color="#007AFF" />
-        <Text style={[styles.statusBarText, isDarkMode ? { color: '#FFFFFF' } : { color: '#333' }]}>Confirming</Text>
-      </View>
-      <View style={styles.statusBarItem}>
-        <Ionicons name="gift-outline" size={24} color="#FF9500" />
-        <Text style={[styles.statusBarText, isDarkMode ? { color: '#FFFFFF' } : { color: '#333' }]}>Preparing</Text>
-      </View>
-      <View style={styles.statusBarItem}>
-        <Ionicons name="bicycle-outline" size={24} color="#4CD964" />
-        <Text style={[styles.statusBarText, isDarkMode ? { color: '#FFFFFF' } : { color: '#333' }]}>Delivering</Text>
-      </View>
-    </View>
-  );
-};
-
-const PreviousOrder = () => {
-  const colorScheme = useColorScheme();
-  const { isDarkMode } = useTheme();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [products, setProducts] = useState<any[]>([]);
-  const [simulatedOrder, setSimulatedOrder] = useState<Order | null>(null);
-  const [selectedProductIds, setSelectedProductIds] = useState<string[]>(['product1', 'product2']); // HARDCODED PRODUCT ID'S
-
-  const dynamicStyles = StyleSheet.create({
-    text: {
-      color: isDarkMode ? '#FFFFFF' : 'black',
-    },
-    secondaryText: {
-      color: isDarkMode ? '#777' : '#555',
-    },
-    card: {
-      backgroundColor: isDarkMode ? '#1E1E1E' : 'white',
-    },
-  });
-
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'AUD',
-  });
-
-  useEffect(() => {
-    setIsLoading(true);
-    const fetchProducts = async () => {
-      try {
-        const colref = collection(db, 'products');
-        const snapshot = await getDocs(colref);
-        const fetchedProducts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setProducts(fetchedProducts);
-        setIsLoading(false);
-      } catch (err: any) {
-        console.error('Error fetching products:', err);
-        setIsLoading(false);
-        setError('Failed to fetch product data to simulate order.');
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    if (products.length > 0 && selectedProductIds.length > 0) {
-      const orderItems: OrderItem[] = [];
-      let totalAmount = 0;
-
-      selectedProductIds.forEach(id => {
-        const selectedProduct = products.find(p => p.id === id);
-        if (selectedProduct) {
-          const orderItem: OrderItem = {
-            name: selectedProduct.name,
-            image: selectedProduct.image,
-            price: selectedProduct.price,
-            originalPrice: selectedProduct.originalPrice,
-            deliveryDate: 'Mon 31/03/2025', // delivery date shown on product
-            quantity: 1,
-          };
-          orderItems.push(orderItem);
-          totalAmount += selectedProduct.price;
-        } else {
-          setError(`Product with ID "${id}" not found.`); // cant find product
-        }
-      });
-
-      const order: Order = {
-        id: 'Order 001',
-        orderId: '001',
-        orderDate: new Date().toLocaleDateString(),
-        items: orderItems,
-        totalAmount: totalAmount,
-      };
-      setSimulatedOrder(order);
-    }
-  }, [products, selectedProductIds]);
-
-  return (
-    <View style={[styles.previousOrderContainer, isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: 'white' }]}>
-      <Text style={[dynamicStyles.text, { marginBottom: 10, color: isDarkMode? '#FFFFFF': '#000000' }, { fontSize: 20 }]}>Order 001:</Text>
-      {isLoading && <ActivityIndicator size="large" color={Colors[colorScheme ?? 'light'].text} style={{ marginTop: 15 }} />}
-      {error && <Text style={[dynamicStyles.text, { color: 'red', marginTop: 15 }]}>{error}</Text>}
-
-      {simulatedOrder && (
-        <View style={{ marginTop: 20 }}>
-          {simulatedOrder.items.map((item, index) => (
-            <View key={index} style={styles.orderItem}>
-              <Image source={{ uri: item.image }} style={styles.orderItemImage} />
-              <View style={styles.orderItemDetails}>
-                <Text style={[dynamicStyles.text, styles.orderItemName, isDarkMode ? { color: '#FFFFFF' } : { color: '#000000' }]}>{item.name}</Text>
-                <View style={styles.priceRow}>
-                  <Text style={[dynamicStyles.text, styles.currentPrice, isDarkMode ? { color: '#FFFFFF' } : { color: '#000000' }]}>{formatter.format(item.price)}</Text>
-                  {item.originalPrice && (
-                    <Text style={[dynamicStyles.secondaryText, styles.originalPrice]}>
-                      {formatter.format(item.originalPrice)}
-                    </Text>
-                  )}
-                </View>
-                {item.deliveryDate && (
-                  <Text style={[dynamicStyles.secondaryText, styles.deliveryInfo]}>Delivers {item.deliveryDate}</Text>
-                )}
-                <Text style={[dynamicStyles.secondaryText, styles.gstInfo]}>
-                  Include GST of {formatter.format(item.price / 11)}
-                </Text>
-                <Text style={[dynamicStyles.secondaryText, { fontSize: 12,  color: isDarkMode? '#FFFFFF': '#777' }]}>
-                  Quantity: {item.quantity}
-                </Text>
-              </View>
-            </View>
-          ))}
-          <View style={{ marginTop: 10 }}>
-            <Text style={[dynamicStyles.text, { fontWeight: 'bold',  color: isDarkMode? '#FFFFFF': '#000000' }]}>
-              Total Amount: {formatter.format(simulatedOrder.totalAmount)}
-            </Text>
-          </View>
-        </View>
-      )}
-      {!isLoading && !error && !simulatedOrder && products.length > 0 && (
-        <Text style={[dynamicStyles.text, { marginTop: 15 }]}>Loading: {selectedProductIds.join(', ')}</Text>
-      )}
-      {!isLoading && !error && products.length === 0 && (
-        <Text style={[dynamicStyles.text, { marginTop: 15 }]}>No products.</Text>
-      )}
-    </View>
-  );
-};
-
-const FeedbackSection = () => {
-  const colorScheme = useColorScheme();
-  const { isDarkMode } = useTheme();
-  const dynamicStyles = StyleSheet.create({
-    text: {
-      color: Colors[colorScheme ?? 'light'].text,
-    },
-    feedbackBar: {
-      backgroundColor: isDarkMode ? '#1E1E1E' : 'white',
-    },
-  });
-
-  return (
-    <View style={[styles.feedbackContainer, isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: 'white' }]}>
-      <Text style={[styles.feedbackTitle, dynamicStyles.text, isDarkMode ? { color: '#FFFFFF' } : { color: '#000000' }]}>Feedback</Text>
-      <View style={styles.feedbackBar}>
-        <TouchableOpacity style={styles.feedbackOption}>
-          <Ionicons name="thumbs-down-outline" size={24} color="#FF3B30" />
-          <Text style={[styles.feedbackLabel, dynamicStyles.text, isDarkMode ? { color: '#FFFFFF' } : { color: '#555' }]}>Unhappy</Text>
-        </TouchableOpacity>
-        <View style={styles.ratingStars}>
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Ionicons key={index} name="star-outline" size={24} color="#FFD700" />
-          ))}
-        </View>
-        <TouchableOpacity style={styles.feedbackOption}>
-          <Ionicons name="happy-outline" size={24} color="#4CD964" />
-          <Text style={[styles.feedbackLabel, dynamicStyles.text, isDarkMode ? { color: '#FFFFFF' } : { color: '#555' }]}>Extremely Happy</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
 
 export default function OrdersScreen() {
-  const colorScheme = useColorScheme();
-  const { theme, toggleTheme, isDarkMode } = useTheme();
+  const [isRating, setIsRating] = useState(false);
+
+    const handleRating = async (star: number) => {
+    if (isRating || !orders[currentOrderIndex]?.id) return;
+    setIsRating(true);
+    try {
+      await updateDoc(doc(db, 'orders', orders[currentOrderIndex].id), { rating: star });
+      
+    } catch (error) {
+      console.error('Rating update failed:', error);
+    }
+    setIsRating(false);
+  };
+
+    const colorScheme = useColorScheme();
+  const { isDarkMode, toggleTheme } = useTheme();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [currentOrderIndex, setCurrentOrderIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const dynamicStyles = StyleSheet.create({
     container: {
@@ -223,178 +56,239 @@ export default function OrdersScreen() {
       backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF',
     },
     text: {
-      color: isDarkMode ? '#FFFFFF' : 'black',
+      color: isDarkMode ? '#FFFFFF' : '#000000',
     },
   });
 
-  return (
-    <SafeAreaView style={[styles.container, dynamicStyles.container]}>
-      <View style={[styles.header, dynamicStyles.header]}>
-        <View style={styles.titleContainer}>
-          <Text style={[styles.headerText, dynamicStyles.text]}>
-            Orders<Text style={{ fontSize: 12 }}> ({ 1 })</Text>
-          </Text>
-        </View>
-        <TouchableOpacity style={styles.darkModeButton} onPress={toggleTheme}>
-          <MaterialIcons
-            name={isDarkMode ? 'wb-sunny' : 'dark-mode'}
-            size={24}
-            color={isDarkMode ? '#FFD700' : 'black'}
-          />
-        </TouchableOpacity>
-      </View>
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'AUD',
+  });
 
-      <ScrollView style={styles.content}>
-        <OrderStatusBar />
-        <PreviousOrder />
-        <FeedbackSection />
-      </ScrollView>
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) {
+      console.warn('User not authenticated');
+      setLoading(false);
+      return;
+    }
+
+    const q = query(collection(db, 'orders'), where('userId', '==', user.uid));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const fetched = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Order));
+        const sorted = fetched.sort((a, b) => (a.createdAt?.seconds ?? 0) - (b.createdAt?.seconds ?? 0));
+        setOrders(sorted);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error fetching orders:', error);
+        setLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  const currentOrder = orders[currentOrderIndex];
+
+  return (
+    <View style={[styles.container, dynamicStyles.container]}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={[styles.header, dynamicStyles.header]}>
+          <TouchableOpacity style={styles.headerSide} />
+          <Text style={[styles.headerText, dynamicStyles.text]}>
+            Orders
+            <Text style={{ fontSize: 12 }}> ({orders.length})</Text>
+          </Text>
+          <TouchableOpacity style={styles.headerSide} onPress={toggleTheme}>
+            <MaterialIcons
+              name={isDarkMode ? 'wb-sunny' : 'dark-mode'}
+              size={24}
+              color={isDarkMode ? '#FFD700' : 'black'}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={[styles.statusBar, isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#F0F0F0' }]}>
+            <View style={styles.statusItem}>
+              <Ionicons name="clipboard-outline" size={30} color="#007AFF" />
+              <Text style={[styles.statusText, dynamicStyles.text]}>Confirming</Text>
+            </View>
+            <View style={styles.statusItem}>
+              <Ionicons name="gift-outline" size={30} color="#FF9500" />
+              <Text style={[styles.statusText, dynamicStyles.text]}>Preparing</Text>
+            </View>
+            <View style={styles.statusItem}>
+              <Ionicons name="bicycle-outline" size={30} color="#4CD964" />
+              <Text style={[styles.statusText, dynamicStyles.text]}>Delivering</Text>
+            </View>
+          </View>
+
+          {loading ? (
+            <ActivityIndicator size="large" color={Colors[colorScheme ?? 'light'].text} />
+          ) : orders.length === 0 ? (
+            <Text
+              style={[
+                dynamicStyles.text,
+                { textAlign: 'center', marginTop: 30, fontSize: 16, paddingHorizontal: 20 },
+              ]}>
+              You have not placed any orders yet. Head over to the home page and start shopping!
+            </Text>
+          ) : (
+            <View style={{ paddingHorizontal: 15 }}>
+              <View
+                style={[
+                  {
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: 10,
+                    borderRadius: 10,
+                  },
+                  isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#61EDFF' },
+                ]}>
+                <TouchableOpacity
+                  disabled={currentOrderIndex === 0}
+                  onPress={() => setCurrentOrderIndex((prev) => Math.max(prev - 1, 0))}>
+                  <Ionicons
+                    name="chevron-back"
+                    size={32}
+                    color={currentOrderIndex === 0 ? '#aaa' : '#007AFF'}
+                  />
+                </TouchableOpacity>
+
+                <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 18 }]}>Order #{String(currentOrderIndex + 1).padStart(3, '0')}</Text>
+
+                <TouchableOpacity
+                  disabled={currentOrderIndex === orders.length - 1}
+                  onPress={() => setCurrentOrderIndex((prev) => Math.min(prev + 1, orders.length - 1))}>
+                  <Ionicons
+                    name="chevron-forward"
+                    size={32}
+                    color={currentOrderIndex === orders.length - 1 ? '#aaa' : '#007AFF'}
+                  />
+                </TouchableOpacity>
+              </View>
+
+              {currentOrder.items.map((item, i) => (
+                <View
+                  key={i}
+                  style={[
+                    styles.itemCard,
+                    isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: 'white' },
+                  ]}>
+                  <Image source={{ uri: item.image }} style={styles.itemImage} />
+                  <View style={styles.itemDetails}>
+                    <Text style={[styles.itemName, dynamicStyles.text]}>{item.name}</Text>
+                    <Text style={dynamicStyles.text}>{formatter.format(item.price)}</Text>
+                    <Text style={dynamicStyles.text}>Quantity: {item.quantity}</Text>
+                    <Text style={dynamicStyles.text}>GST: {formatter.format(item.price / 11)}</Text>
+                  </View>
+                </View>
+              ))}
+
+              <Text style={[dynamicStyles.text, { paddingLeft: 15, marginTop: 10 }]}>Total: {formatter.format(currentOrder.totalAmount)}</Text>
+
+              <View
+                style={[
+                  {
+                    flexDirection: 'row',
+                    justifyContent: 'space-around',
+                    alignItems: 'center',
+                    padding: 10,
+                    marginTop: 10,
+                    borderRadius: 8,
+                  },
+                  isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#F0F0F0' },
+                ]}>
+                <TouchableOpacity onPress={async () => await updateDoc(doc(db, 'orders', currentOrder.id), { feedback: 'unhappy' })}>
+                  <Ionicons name="thumbs-down-outline" size={30} color="#FF3B30" />
+                  <Text style={[dynamicStyles.text, { textAlign: 'center', fontSize: 12 }]}>Unhappy</Text>
+                </TouchableOpacity>
+
+                <View style={{ flexDirection: 'row', gap: 5 }}>
+                  {[1, 2, 3, 4, 5].map((star) => (<TouchableOpacity key={star}
+                    onPress={() => handleRating(star)}>
+                    <Ionicons
+                      name={star <= (currentOrder.rating || 0) ? 'star' : 'star-outline'} size={30}
+                      color="#FFD700"
+                    />
+                  </TouchableOpacity>))}
+                </View>
+
+                <TouchableOpacity onPress={async () => await updateDoc(doc(db, 'orders', currentOrder.id), { feedback: 'happy' })}>
+                  <Ionicons name="happy-outline" size={30} color="#4CD964" />
+                  <Text style={[dynamicStyles.text, { textAlign: 'center', fontSize: 12 }]}>Happy</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </ScrollView>
     </SafeAreaView>
+  </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 20,
-    backgroundColor: '#e9f5f9',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    backgroundColor: '#61EDFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    justifyContent: 'space-between',
+    marginBottom: 5,
+    padding: 22,
+},
+    headerText: {
+        fontSize: 40,
+        fontWeight: 'bold',
+    },
+  headerSide: {
+    width: 30,
   },
-  titleContainer: {
-    alignItems: 'center',
+  scrollContent: {
+    paddingBottom: 30,
+    backgroundColor: 'transparent',
   },
-  headerText: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: '#000000',
-  },
-  darkModeButton: {
-    position: 'absolute',
-    right: '7%',
-    top: '50%',
-    transform: [{ translateY: -12 }],
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 15,
-  },
-  orderStatusBar: {
+  statusBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 15,
-    marginBottom: 15,
-    backgroundColor: '#F0F0F0',
+    paddingVertical: 25,
     borderRadius: 8,
+    margin: 15,
   },
-  statusBarItem: {
+  statusItem: {
     alignItems: 'center',
   },
-  statusBarText: {
+  statusText: {
     fontSize: 12,
     marginTop: 5,
-    color: '#333',
   },
-  previousOrderContainer: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 15,
-  },
-  orderHeader: {
+  itemCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    marginTop: 10,
     marginBottom: 10,
+    borderRadius: 10,
+    padding: 10,
+    elevation: 1,
   },
-  orderIdText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000000',
-  },
-  orderItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingBottom: 15,
-  },
-  orderItemImage: {
+  itemImage: {
     width: 80,
     height: 80,
+    marginRight: 10,
     resizeMode: 'contain',
-    marginRight: 15,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#eee',
   },
-  orderItemDetails: {
+  itemDetails: {
     flex: 1,
+    justifyContent: 'space-between',
   },
-  orderItemName: {
+  itemName: {
     fontSize: 16,
     fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 3,
-  },
-  currentPrice: {
-    fontSize: 16,
-    marginRight: 8,
-    color: '#000',
-  },
-  originalPrice: {
-    fontSize: 14,
-    color: '#777',
-    textDecorationLine: 'line-through',
-  },
-  deliveryInfo: {
-    fontSize: 12,
-    color: '#007AFF',
-    marginBottom: 3,
-  },
-  gstInfo: {
-    fontSize: 12,
-    color: '#777',
-  },
-  feedbackContainer: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 15,
-    marginBottom: 15,
-    marginTop: 10
-  },
-  feedbackTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  feedbackBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  feedbackOption: {
-    alignItems: 'center',
-  },
-  feedbackLabel: {
-    fontSize: 12,
-    marginTop: 5,
-    color: '#555',
-  },
-  ratingStars: {
-    flexDirection: 'row',
   },
 });
-
