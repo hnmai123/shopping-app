@@ -1,15 +1,13 @@
-import { StyleSheet, View, Text, SafeAreaView, TextInput, Image, ActivityIndicator, Dimensions, TouchableOpacity } from 'react-native';
-import { useEffect, useState } from 'react';
-import { doc, getDocs, collection, onSnapshot } from 'firebase/firestore';
-import { getDoc, setDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db, auth } from '../../firebase/firebaseConfig';
-import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
-import filter from 'lodash.filter';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useCart } from '../../context/CartContext';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import React from 'react';
+import { collection, doc, getDoc, onSnapshot, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import filter from 'lodash.filter';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
+import { auth, db } from '../../firebase/firebaseConfig';
 
 export default function HomeScreen() {
   const { cart, updateCart } = useCart();
@@ -39,7 +37,7 @@ export default function HomeScreen() {
   useEffect(() => {
     setIsLoading(true);
     const colref = collection(db, 'products');
-  
+
     const unsubscribe = onSnapshot(colref, (snapshot) => {
       const fetchedData = snapshot.docs.map((doc) => {
         const docData = doc.data();
@@ -61,7 +59,7 @@ export default function HomeScreen() {
       setError('Failed to fetch data');
       setIsLoading(false);
     });
-  
+
     return () => unsubscribe(); // Cleanup
   }, []);
 
@@ -116,7 +114,7 @@ export default function HomeScreen() {
         updatedAt: serverTimestamp(),
       });
     }
-    
+
     updateCart((previousCart: any[]) => {
       const existingProduct = previousCart.find((item) => item.id === product.id);
       if (existingProduct) {
@@ -202,10 +200,10 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
           <TouchableOpacity style={styles.darkModeButton} onPress={toggleTheme}>
-            <MaterialIcons 
-              name={isDarkMode ? 'wb-sunny' : 'dark-mode'} 
-              size={24} 
-              color={isDarkMode ? '#FFD700' : 'black'} 
+            <MaterialIcons
+              name={isDarkMode ? 'wb-sunny' : 'dark-mode'}
+              size={24}
+              color={isDarkMode ? '#FFD700' : 'black'}
             />
           </TouchableOpacity>
         </View>
@@ -275,14 +273,12 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   darkModeButton: {
-    height: 46,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: '7%',
-    marginBottom: 10,
+    margin: 20,
   },
   loadingContainer: {
     flex: 1,
