@@ -18,14 +18,6 @@ import {
   View,
 } from 'react-native';
 
-interface OrderItem {
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
-}
-
-
 
 export default function OrdersScreen() {
   const [isRating, setIsRating] = useState(false);
@@ -44,6 +36,22 @@ export default function OrdersScreen() {
 
     const colorScheme = useColorScheme();
   const { isDarkMode, toggleTheme } = useTheme();
+  interface OrderItem {
+    name: string;
+    price: number;
+    quantity: number;
+    image: string;
+  }
+
+  interface Order {
+    id: string;
+    items: OrderItem[];
+    totalAmount: number;
+    createdAt?: { seconds: number };
+    rating?: number;
+    feedback?: string;
+  }
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentOrderIndex, setCurrentOrderIndex] = useState(0);
   const [loading, setLoading] = useState(true);
