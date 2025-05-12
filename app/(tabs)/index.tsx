@@ -65,6 +65,15 @@ export default function HomeScreen() {
     return () => unsubscribe(); // Cleanup
   }, []);
 
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 3000); // Clear error after 3 seconds
+      return () => clearTimeout(timer);
+      }
+  }, [error]);
+
   const uploadImageForLabeling = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     if (permissionResult.granted === false) {
