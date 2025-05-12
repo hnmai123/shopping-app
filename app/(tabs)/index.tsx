@@ -1,6 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { collection, doc, getDoc, onSnapshot, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import * as ImagePicker from 'expo-image-picker';
+import { collection, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
 import filter from 'lodash.filter';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -63,6 +65,54 @@ export default function HomeScreen() {
     return () => unsubscribe(); // Cleanup
   }, []);
 
+  const uploadImageForLabeling = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert('Permission to access camera is required!');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      base64: false
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const response = await fetch(result.assets[0].uri);
+      const blob = await response.blob();
+      const fileName = `uploads/${Date.now()}.jpg`;
+      const storageRef = ref(getStorage(), fileName);
+      try {
+        await uploadBytes(storageRef, blob);
+
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate a delay for the upload
+
+        const labelSnap = await getDocs(collection(db, 'imageLabels'));
+        const latest = labelSnap.docs.sort((a, b) => b.data().createdAt.seconds - a.data().createdAt.seconds)[0];
+        return latest?.data().labels || []
+      } finally {
+        await deleteObject(storageRef);
+      }
+    }
+    return [];
+  };
+
+  const handleCameraSearch = async () => {
+    try {
+      setIsLoading(true)
+      const labels = await uploadImageForLabeling();
+      if (!labels.length) {
+        setError('No labels detected from image');
+        return;
+      }
+
+      const matchedData = filter(fullData, (item: any) => contains(item, labels));
+      setData(matchedData);
+    } catch (error) {
+      setError('Failed to search by image')
+    } finally {
+      setIsLoading(false);
+    }
+  }
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     const formatterdquery = query.toLowerCase();
@@ -70,6 +120,7 @@ export default function HomeScreen() {
       return contains(item, formatterdquery);
     })
     setData(filteredData);
+    console.log('Filtered data:', filteredData);
   }
 
   const contains = ({ name, description }: { name: string; description: string }, query: string) => {
@@ -195,7 +246,7 @@ export default function HomeScreen() {
               value={searchQuery}
               onChangeText={(query) => handleSearch(query)}
             />
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleCameraSearch}>
               <Ionicons name="camera-outline" size={24} color={isDarkMode ? '#FFFFFF' : 'black'} />
             </TouchableOpacity>
           </View>
