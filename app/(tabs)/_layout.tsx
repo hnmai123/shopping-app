@@ -13,7 +13,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
   const { isDarkMode } = useTheme();
 
-  return (
+   return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: isDarkMode ? '#FFFFFF' : Colors.light.tint,
@@ -32,18 +32,26 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <Ionicons size={28} name="home" color={color} />,
         }}
       />
+      
       <Tabs.Screen
         name="(cart)"
         options={{
           title: 'Cart',
           tabBarIcon: ({ color }) => <Ionicons size={28} name="cart-outline" color={color} />,
         }}
-        />
+      />
       <Tabs.Screen
         name="orders"
         options={{
           title: 'Orders',
           tabBarIcon: ({ color }) => <Ionicons size={28} name="bag-check-outline" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="notifications"
+        options={{
+          title: 'Notifications',
+          tabBarIcon: ({ color }) => <Ionicons size={28} name="notifications-outline" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -59,8 +67,8 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    borderTopWidth: 0, // Remove border for a cleaner look
-    position: Platform.OS === 'ios' ? 'absolute' : 'relative', // Float on iOS
-    elevation: 5, // Add shadow on Android
+    borderTopWidth: 0,
+    position: Platform.OS === 'ios' ? 'absolute' : 'relative',
+    elevation: 5,
   },
 });

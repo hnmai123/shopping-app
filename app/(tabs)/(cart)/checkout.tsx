@@ -12,6 +12,7 @@ import { useTheme } from '../../../context/ThemeContext';
 
 export default function CheckoutScreen() {
     const {updateCart} = useCart();
+    const [showNotification, setShowNotification] = useState(false); // Add notification state
 
     type RootStackParamList = {
         checkout: { cart: any[]; cartCount: number; totalAmount: number };
@@ -89,7 +90,19 @@ export default function CheckoutScreen() {
         },
         icon: {
             color: isDarkMode ? '#FFFFFF' : 'black',
-        }
+        },
+        notificationBanner: {
+            position: 'absolute',
+            bottom: 20,
+            left: 20,
+            right: 20,
+            padding: 15,
+            borderRadius: 10,
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 100,
+            backgroundColor: isDarkMode ? '#00B1BA' : '#00B1BA',  // Make sure the background color is not red
+        },
     });
 
     const handleCheckout = async () => {
@@ -194,11 +207,34 @@ export default function CheckoutScreen() {
                         <TouchableOpacity style={[styles.placeOrderButton, dynamicStyles.button]} onPress={handleCheckout}>
                             <Text style={{ fontWeight: 'bold', fontSize: 17, color: 'white' }}>Place Order</Text>
                         </TouchableOpacity>
+                        <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20 }]}>{formatter.format(totalAmount)}</Text>
+                        <TouchableOpacity 
+                            style={[styles.placeOrderButton, dynamicStyles.button]} 
+                            onPress={() => {
+                                // Handle order placement logic here
+                                setShowNotification(true);
+                                
+                                // Show notification for 3 seconds
+                                setTimeout(() => {
+                                    setShowNotification(false);
+                                    navigation.navigate('orders' as never);
+                                }, 3000);
+                            }}
+                        >
+                            <Text style={{ fontWeight: 'bold', fontSize: 20, color: 'white' }}>Place Order</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
+
+                {/* Notification Banner */}
+                {showNotification && (
+                    <View style={styles.notificationBanner}>
+                        <Text style={{ color: 'white', fontWeight: 'bold' }}>Your order has been placed successfully!</Text>
+                    </View>
+                )}
             </SafeAreaView>
         </GestureHandlerRootView>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -261,5 +297,17 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 10
+    },
+    notificationBanner: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        right: 20,
+        padding: 15,
+        borderRadius: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 100,
+        backgroundColor: '#00B1BA',  // Ensure it’s not red
     }
 });
