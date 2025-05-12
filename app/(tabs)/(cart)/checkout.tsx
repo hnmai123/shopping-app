@@ -204,20 +204,15 @@ export default function CheckoutScreen() {
                     <View style={styles.cartSummaryRow}>
                         <Text style={dynamicStyles.text}>Total Amount</Text>
                         <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 17 }]}>{formatter.format(totalAmount)}</Text>
-                        <TouchableOpacity style={[styles.placeOrderButton, dynamicStyles.button]} onPress={handleCheckout}>
-                            <Text style={{ fontWeight: 'bold', fontSize: 17, color: 'white' }}>Place Order</Text>
-                        </TouchableOpacity>
-                        <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 20 }]}>{formatter.format(totalAmount)}</Text>
                         <TouchableOpacity 
                             style={[styles.placeOrderButton, dynamicStyles.button]} 
                             onPress={() => {
                                 // Handle order placement logic here
                                 setShowNotification(true);
-                                
+                                handleCheckout(); // Call the checkout function
                                 // Show notification for 3 seconds
                                 setTimeout(() => {
                                     setShowNotification(false);
-                                    navigation.navigate('orders' as never);
                                 }, 3000);
                             }}
                         >

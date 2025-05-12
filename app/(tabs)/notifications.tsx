@@ -68,8 +68,11 @@ export default function NotificationsScreen() {
   return (
     <SafeAreaView style={[styles.container, dynamicStyles.container]}>
       <View style={[styles.header, dynamicStyles.header]}>
+        <TouchableOpacity style={{marginLeft: "7%"}}>
+          <MaterialIcons name="message" size={24} color={isDarkMode ? '#FFD700' : 'black'}/>
+        </TouchableOpacity>
         <Text style={[styles.headerText, dynamicStyles.text]}>Notifications</Text>
-        <TouchableOpacity onPress={toggleTheme}>
+        <TouchableOpacity onPress={toggleTheme} style={{marginRight: "7%"}}>
           <MaterialIcons 
             name={isDarkMode ? 'wb-sunny' : 'dark-mode'} 
             size={24} 

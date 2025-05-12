@@ -70,9 +70,9 @@ export default function Account() {
       updateCart([]);
       setGlobalAddress(''); // Reset address
       setGlobalCoords({
-      latitude: -33.8688,
-      longitude: 151.2093,
-    });
+        latitude: -33.8688,
+        longitude: 151.2093,
+      });
       await auth.signOut();
       navigation.navigate('(auth)' as never);
     } catch (error) {
@@ -147,11 +147,11 @@ export default function Account() {
       marginVertical: 8,
       justifyContent: 'space-between',
       marginHorizontal: 10,
+      paddingVertical: 5,
     },
     divider: {
       height: 1,
       backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
-      marginTop: 4,
     },
     addressCard: {
       backgroundColor: isDarkMode ? '#1E1E1E' : '#FFFFFF',
@@ -206,8 +206,11 @@ export default function Account() {
               <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                 <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Billing & Shipping Address</Text>
               </View>
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-                <TouchableOpacity style={{ width: '50%', marginRight: 10 }} onPress={() => navigation.navigate('map' as never)}>
+
+              <View style={dynamicStyles.divider} />
+
+              <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingTop: 5 }}>
+                <TouchableOpacity style={{ width: '50%', marginRight: 10}} onPress={() => navigation.navigate('map' as never)}>
                   <MapComponent initialLocation={coords} selectable={false} height={150} />
                 </TouchableOpacity>
                 <View style={{ flex: 1, margin: 5, gap: 10 }}>
@@ -221,10 +224,12 @@ export default function Account() {
                 </View>
               </View>
             </View>
+
             <View style={dynamicStyles.paymentCard}>
               <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                 <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Payment Information</Text>
               </View>
+              <View style={dynamicStyles.divider} />
 
               <View style={dynamicStyles.paymentRow}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
@@ -268,16 +273,23 @@ export default function Account() {
               <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                 <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Support</Text>
               </View>
+
+              <View style={dynamicStyles.divider} />
+
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
                 <MaterialIcons name="report-gmailerrorred" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
                 <Text style={dynamicStyles.text}>Contact us</Text>
               </TouchableOpacity>
+
               <View style={dynamicStyles.divider} />
+
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
                 <Ionicons name="settings-outline" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
                 <Text style={dynamicStyles.text}>Setting</Text>
               </TouchableOpacity>
+
               <View style={dynamicStyles.divider} />
+
               <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }} onPress={handleLogout}>
                 <MaterialIcons name="logout" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
                 <Text style={dynamicStyles.text}>Log out</Text>

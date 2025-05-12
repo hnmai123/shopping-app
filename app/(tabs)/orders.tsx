@@ -22,19 +22,19 @@ import {
 export default function OrdersScreen() {
   const [isRating, setIsRating] = useState(false);
 
-    const handleRating = async (star: number) => {
+  const handleRating = async (star: number) => {
     if (isRating || !orders[currentOrderIndex]?.id) return;
     setIsRating(true);
     try {
       await updateDoc(doc(db, 'orders', orders[currentOrderIndex].id), { rating: star });
-      
+
     } catch (error) {
       console.error('Rating update failed:', error);
     }
     setIsRating(false);
   };
 
-    const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme();
   const { isDarkMode, toggleTheme } = useTheme();
   interface OrderItem {
     name: string;
@@ -105,7 +105,9 @@ export default function OrdersScreen() {
     <View style={[styles.container, dynamicStyles.container]}>
       <SafeAreaView style={{ flex: 1 }}>
         <View style={[styles.header, dynamicStyles.header]}>
-          <TouchableOpacity style={styles.headerSide} />
+          <TouchableOpacity style={{ marginLeft: "7%" }}>
+            <MaterialIcons name="message" size={24} color={isDarkMode ? '#FFD700' : 'black'} />
+          </TouchableOpacity>
           <Text style={[styles.headerText, dynamicStyles.text]}>
             Orders
             <Text style={{ fontSize: 12 }}> ({orders.length})</Text>
@@ -120,7 +122,7 @@ export default function OrdersScreen() {
         </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={[styles.statusBar, isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#F0F0F0' }]}>
+          <View style={[styles.statusBar, isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#FFFFFF' }]}>
             <View style={styles.statusItem}>
               <Ionicons name="clipboard-outline" size={30} color="#007AFF" />
               <Text style={[styles.statusText, dynamicStyles.text]}>Confirming</Text>
@@ -147,58 +149,72 @@ export default function OrdersScreen() {
             </Text>
           ) : (
             <View style={{ paddingHorizontal: 15 }}>
-              <View
-                style={[
-                  {
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: 10,
-                    borderRadius: 10,
-                  },
-                  isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#61EDFF' },
-                ]}>
-                <TouchableOpacity
-                  disabled={currentOrderIndex === 0}
-                  onPress={() => setCurrentOrderIndex((prev) => Math.max(prev - 1, 0))}>
-                  <Ionicons
-                    name="chevron-back"
-                    size={32}
-                    color={currentOrderIndex === 0 ? '#aaa' : '#007AFF'}
-                  />
-                </TouchableOpacity>
-
-                <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 18 }]}>Order #{String(currentOrderIndex + 1).padStart(3, '0')}</Text>
-
-                <TouchableOpacity
-                  disabled={currentOrderIndex === orders.length - 1}
-                  onPress={() => setCurrentOrderIndex((prev) => Math.min(prev + 1, orders.length - 1))}>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={32}
-                    color={currentOrderIndex === orders.length - 1 ? '#aaa' : '#007AFF'}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {currentOrder.items.map((item, i) => (
+              <View style={[isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: 'white' }, { paddingBottom: 10, borderRadius: 10 }]}>
                 <View
-                  key={i}
                   style={[
-                    styles.itemCard,
-                    isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: 'white' },
+                    {
+                      flexDirection: 'row',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: 10,
+                      borderTopLeftRadius: 10,
+                      borderTopRightRadius: 10,
+                    },
+                    isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#61EDFF' },
                   ]}>
-                  <Image source={{ uri: item.image }} style={styles.itemImage} />
-                  <View style={styles.itemDetails}>
-                    <Text style={[styles.itemName, dynamicStyles.text]}>{item.name}</Text>
-                    <Text style={dynamicStyles.text}>{formatter.format(item.price)}</Text>
-                    <Text style={dynamicStyles.text}>Quantity: {item.quantity}</Text>
-                    <Text style={dynamicStyles.text}>GST: {formatter.format(item.price / 11)}</Text>
-                  </View>
-                </View>
-              ))}
+                  <TouchableOpacity
+                    disabled={currentOrderIndex === 0}
+                    onPress={() => setCurrentOrderIndex((prev) => Math.max(prev - 1, 0))}>
+                    <Ionicons
+                      name="chevron-back"
+                      size={32}
+                      color={currentOrderIndex === 0 ? '#aaa' : '#007AFF'}
+                    />
+                  </TouchableOpacity>
 
-              <Text style={[dynamicStyles.text, { paddingLeft: 15, marginTop: 10 }]}>Total: {formatter.format(currentOrder.totalAmount)}</Text>
+                  <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 18 }]}>Order #{String(currentOrderIndex + 1).padStart(3, '0')}</Text>
+
+                  <TouchableOpacity
+                    disabled={currentOrderIndex === orders.length - 1}
+                    onPress={() => setCurrentOrderIndex((prev) => Math.min(prev + 1, orders.length - 1))}>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={32}
+                      color={currentOrderIndex === orders.length - 1 ? '#aaa' : '#007AFF'}
+                    />
+                  </TouchableOpacity>
+
+                </View>
+                <View style={{
+                  height: 1,
+                  backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
+                }} />
+                {currentOrder.items.map((item, i) => (
+                  <React.Fragment key={item.name + i}>
+                    <View
+                      style={[
+                        styles.itemCard,
+                        isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: 'white' },
+                      ]}>
+                      <Image source={{ uri: item.image }} style={styles.itemImage} />
+                      <View style={styles.itemDetails}>
+                        <Text style={[styles.itemName, dynamicStyles.text]}>{item.name}</Text>
+                        <Text style={dynamicStyles.text}>{formatter.format(item.price)}</Text>
+                        <Text style={dynamicStyles.text}>Quantity: {item.quantity}</Text>
+                        <Text style={dynamicStyles.text}>GST: {formatter.format(item.price / 11)}</Text>
+                      </View>
+                    </View>
+                    <View
+                      style={{
+                        height: 1,
+                        backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
+                      }}
+                    />
+                  </React.Fragment>
+                ))}
+
+                <Text style={[dynamicStyles.text, { paddingLeft: 15, marginTop: 10, fontWeight: 'bold' }]}>Total: {formatter.format(currentOrder.totalAmount)}</Text>
+              </View>
 
               <View
                 style={[
@@ -210,7 +226,7 @@ export default function OrdersScreen() {
                     marginTop: 10,
                     borderRadius: 8,
                   },
-                  isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#F0F0F0' },
+                  isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#FFFFFF' },
                 ]}>
                 <TouchableOpacity onPress={async () => await updateDoc(doc(db, 'orders', currentOrder.id), { feedback: 'unhappy' })}>
                   <Ionicons name="thumbs-down-outline" size={30} color="#FF3B30" />
@@ -235,8 +251,8 @@ export default function OrdersScreen() {
             </View>
           )}
         </ScrollView>
-    </SafeAreaView>
-  </View>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -250,13 +266,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 5,
     padding: 22,
-},
-    headerText: {
-        fontSize: 40,
-        fontWeight: 'bold',
-    },
+  },
+  headerText: {
+    fontSize: 40,
+    fontWeight: 'bold',
+  },
   headerSide: {
-    width: 30,
+    marginRight: '7%',
   },
   scrollContent: {
     paddingBottom: 30,
@@ -278,9 +294,8 @@ const styles = StyleSheet.create({
   },
   itemCard: {
     flexDirection: 'row',
-    marginTop: 10,
-    marginBottom: 10,
-    borderRadius: 10,
+    marginVertical: 5,
+    borderRadius: 5,
     padding: 10,
     elevation: 1,
   },

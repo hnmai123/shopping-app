@@ -15,10 +15,10 @@ interface User {
     points?: number;
     address?: string;
     coords?: {
-      latitude: number;
-      longitude: number;
+        latitude: number;
+        longitude: number;
     };
-  }
+}
 
 export default function Supplier() {
     const { theme, toggleTheme, isDarkMode } = useTheme();
@@ -28,19 +28,19 @@ export default function Supplier() {
 
     useEffect(() => {
         const fetchUser = async () => {
-          const currentUser = auth.currentUser;
-          if (currentUser) {
-            const userRef = doc(db, 'users', currentUser.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-              const userData = userSnap.data();
-              setUser(userData);
+            const currentUser = auth.currentUser;
+            if (currentUser) {
+                const userRef = doc(db, 'users', currentUser.uid);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    setUser(userData);
+                }
             }
-          }
         };
-      
+
         fetchUser();
-      }, []);
+    }, []);
 
 
     const dynamicStyles = StyleSheet.create({
@@ -125,6 +125,7 @@ export default function Supplier() {
             justifyContent: 'space-between',
             marginVertical: 8,
             marginHorizontal: 10,
+            paddingVertical: 5,
         }
     });
 
@@ -163,6 +164,13 @@ export default function Supplier() {
                         <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                             <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Store Management</Text>
                         </View>
+                        <View
+                            style={{
+                                height: 1,
+                                backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
+                            }}
+                        />
+
                         <View style={dynamicStyles.managementRow}>
                             <Text style={[dynamicStyles.text]}>Orders</Text>
                             <TouchableOpacity>
@@ -190,6 +198,12 @@ export default function Supplier() {
                         <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
                             <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Data Analytics</Text>
                         </View>
+                        <View
+                            style={{
+                                height: 1,
+                                backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
+                            }}
+                        />
                         <View style={dynamicStyles.managementRow}>
                             <Text style={[dynamicStyles.text]}>Income</Text>
                             <Text style={[dynamicStyles.text]}>$13,123.13</Text>
@@ -218,17 +232,15 @@ export default function Supplier() {
                     </View>
 
                     <View style={dynamicStyles.managementCard}>
-                        <TouchableOpacity style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderRadius: 10, justifyContent: 'space-between', flexDirection: 'row' }}
+                        <TouchableOpacity style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 20, borderRadius: 10, justifyContent: 'space-between', flexDirection: 'row' }}
                             onPress={() => navigation.navigate('addProduct' as never)}>
                             <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Add Product</Text>
                             <TouchableOpacity onPress={() => navigation.navigate('addProduct' as never)}>
-                                <Text style={[dynamicStyles.text, {fontSize: 14 }]}>Upload new item {">"}</Text>
+                                <Text style={[dynamicStyles.text, { fontSize: 14 }]}>Upload new item {">"}</Text>
                             </TouchableOpacity>
                         </TouchableOpacity>
                     </View>
                 </View>
-
-
             </SafeAreaView>
         </GestureHandlerRootView>
     );
