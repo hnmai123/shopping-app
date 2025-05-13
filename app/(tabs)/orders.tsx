@@ -1,4 +1,3 @@
-// orders.tsx (Fixed background color below orders area)
 import { Colors } from '@/constants/Colors';
 import { useTheme } from '@/context/ThemeContext';
 import { auth, db } from '@/firebase/firebaseConfig';
@@ -7,21 +6,12 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { collection, doc, onSnapshot, query, updateDoc, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 
 export default function OrdersScreen() {
   const [isRating, setIsRating] = useState(false);
-
+  // star ratings
   const handleRating = async (star: number) => {
     if (isRating || !orders[currentOrderIndex]?.id) return;
     setIsRating(true);
@@ -36,13 +26,14 @@ export default function OrdersScreen() {
 
   const colorScheme = useColorScheme();
   const { isDarkMode, toggleTheme } = useTheme();
+  // item details
   interface OrderItem {
     name: string;
     price: number;
     quantity: number;
     image: string;
   }
-
+  // order details
   interface Order {
     id: string;
     items: OrderItem[];
@@ -55,7 +46,7 @@ export default function OrdersScreen() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentOrderIndex, setCurrentOrderIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  // darkmode
   const dynamicStyles = StyleSheet.create({
     container: {
       backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
@@ -67,7 +58,7 @@ export default function OrdersScreen() {
       color: isDarkMode ? '#FFFFFF' : '#000000',
     },
   });
-
+  
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'AUD',
@@ -80,7 +71,7 @@ export default function OrdersScreen() {
       setLoading(false);
       return;
     }
-
+    // load orders
     const q = query(collection(db, 'orders'), where('userId', '==', user.uid));
     const unsubscribe = onSnapshot(
       q,
@@ -102,6 +93,7 @@ export default function OrdersScreen() {
   const currentOrder = orders[currentOrderIndex];
 
   return (
+    // header, delivery status, orders, and rating
     <View style={[styles.container, dynamicStyles.container]}>
       <SafeAreaView style={{ flex: 1 }}>
         <View style={[styles.header, dynamicStyles.header]}>
@@ -121,7 +113,7 @@ export default function OrdersScreen() {
           </TouchableOpacity>
         </View>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView contentContainerStyle={styles.scrollContent}> 
           <View style={[styles.statusBar, isDarkMode ? { backgroundColor: '#1E1E1E' } : { backgroundColor: '#FFFFFF' }]}>
             <View style={styles.statusItem}>
               <Ionicons name="clipboard-outline" size={30} color="#007AFF" />

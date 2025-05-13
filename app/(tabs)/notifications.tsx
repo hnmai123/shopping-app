@@ -106,15 +106,17 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 15,
+    marginBottom: 5,
+    padding: 32,
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   listContainer: {
