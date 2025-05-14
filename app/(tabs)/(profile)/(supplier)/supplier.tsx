@@ -1,10 +1,12 @@
+import ManagementCard from "@/components/account/ManagementCard";
+import PersonInfo from "@/components/account/PersonInfo";
+import StoreManagementCard from "@/components/account/StoreManagement";
+import Header from "@/components/Header";
 import { auth, db } from "@/firebase/firebaseConfig";
-import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { Image, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useTheme } from '../../../../context/ThemeContext';
 
@@ -132,104 +134,35 @@ export default function Supplier() {
     return (
         <GestureHandlerRootView style={{ flex: 1 }}>
             <SafeAreaView style={[styles.container, dynamicStyles.container]}>
-                <View style={[styles.header, dynamicStyles.header]}>
-                    <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.goBack()}>
-                        <Ionicons size={30} name="person-outline" color={dynamicStyles.text.color} />
-                    </TouchableOpacity>
-                    <Text style={[{ fontSize: 30, fontWeight: 'bold' }, , dynamicStyles.text]}>Management</Text>
-                    <TouchableOpacity style={{ marginRight: "7%" }} onPress={toggleTheme}>
-                        <MaterialIcons
-                            name={isDarkMode ? 'wb-sunny' : 'dark-mode'}
-                            size={24}
-                            color={isDarkMode ? '#FFD700' : 'black'}
-                        />
-                    </TouchableOpacity>
-                </View>
-
+                <Header
+                    title="Management"
+                    onBack={() => navigation.goBack()}
+                    onToggleTheme={toggleTheme}
+                    isDarkMode={isDarkMode}
+                    dynamicStyles={dynamicStyles}
+                    backIconName="supervisor-account"
+                />
+                
                 <View style={{ backgroundColor: isDarkMode ? '#121212' : '#e9f5f9', flex: 1, alignItems: 'center' }}>
-                    <View style={dynamicStyles.card}>
-                        <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                            <Image
-                                source={require('@/assets/images/Acount.png')}
-                                style={{ width: 50, height: 50, borderRadius: 50 }} />
-                            <Text style={dynamicStyles.text}>Nickname</Text>
-                        </View>
-                        <View style={{ flex: 1, marginLeft: 20 }}>
-                            <Text style={dynamicStyles.text}>{user?.name || 'Name'}</Text>
-                            <Text style={dynamicStyles.text}>Role: Manager</Text>
-                            <Text style={dynamicStyles.text}>{user?.email || "Email"}</Text>
-                        </View>
-                    </View>
-                    <View style={dynamicStyles.managementCard}>
-                        <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-                            <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Store Management</Text>
-                        </View>
-                        <View
-                            style={{
-                                height: 1,
-                                backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
-                            }}
-                        />
+                    <PersonInfo user={user} dynamicStyles={dynamicStyles} role="Manager"/>
 
-                        <View style={dynamicStyles.managementRow}>
-                            <Text style={[dynamicStyles.text]}>Orders</Text>
-                            <TouchableOpacity>
-                                <Text style={[dynamicStyles.text]}>View {">"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={dynamicStyles.divider} />
-                        <View style={dynamicStyles.managementRow}>
-                            <Text style={[dynamicStyles.text]}>Inventory/Stock</Text>
-                            <TouchableOpacity>
-                                <Text style={[dynamicStyles.text]}>View {">"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={dynamicStyles.divider} />
-                        <View style={dynamicStyles.managementRow}>
-                            <Text style={[dynamicStyles.text]}>Status</Text>
-                            <Text style={[dynamicStyles.text]}>Working</Text>
-                            <TouchableOpacity>
-                                <Text style={[dynamicStyles.text]}>View {">"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    <StoreManagementCard
+                        dynamicStyles={dynamicStyles}
+                        isDarkMode={isDarkMode}
+                        onOrders={() => {/* navigate to orders */ }}
+                        onInventory={() => {/* navigate to inventory */ }}
+                        onStatus={() => {/* navigate to status */ }}
+                    />
 
-                    <View style={dynamicStyles.managementCard}>
-                        <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-                            <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Data Analytics</Text>
-                        </View>
-                        <View
-                            style={{
-                                height: 1,
-                                backgroundColor: isDarkMode ? '#383838' : '#61EDFF',
-                            }}
-                        />
-                        <View style={dynamicStyles.managementRow}>
-                            <Text style={[dynamicStyles.text]}>Income</Text>
-                            <Text style={[dynamicStyles.text]}>$13,123.13</Text>
-                        </View>
-                        <View style={dynamicStyles.divider} />
-                        <View style={dynamicStyles.managementRow}>
-                            <Text style={[dynamicStyles.text]}>Dashboard</Text>
-                            <TouchableOpacity>
-                                <Text style={[dynamicStyles.text]}>View {">"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={dynamicStyles.divider} />
-                        <View style={dynamicStyles.managementRow}>
-                            <Text style={[dynamicStyles.text]}>Report</Text>
-                            <TouchableOpacity>
-                                <Text style={[dynamicStyles.text]}>View {">"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={dynamicStyles.divider} />
-                        <View style={dynamicStyles.managementRow}>
-                            <Text style={[dynamicStyles.text]}>Feedback</Text>
-                            <TouchableOpacity>
-                                <Text style={[dynamicStyles.text]}>View {">"}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    <ManagementCard
+                        title="Store Management"
+                        rows={[
+                            { label: "Orders", onPress: () => {/* navigate to orders */ } },
+                            { label: "Inventory/Stock", onPress: () => {/* navigate to inventory */ } },
+                            { label: "Status", value: "Working", onPress: () => {/* navigate to status */ } },
+                        ]}
+                        dynamicStyles={dynamicStyles}
+                    />
 
                     <View style={dynamicStyles.managementCard}>
                         <TouchableOpacity style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 20, borderRadius: 10, justifyContent: 'space-between', flexDirection: 'row' }}

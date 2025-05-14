@@ -1,7 +1,7 @@
 // Account.tsx (Fixed version)
 import Address from '@/components/account/Address';
 import Payment from '@/components/account/Payment';
-import UserInfoCard from '@/components/account/PersonInfo';
+import PersonInfo from '@/components/account/PersonInfo';
 import Support from '@/components/account/Support';
 import Header from '@/components/Header';
 import { useAddress } from '@/context/AddressContext';
@@ -178,7 +178,7 @@ export default function Account() {
 
           <View style={{ backgroundColor: isDarkMode ? '#121212' : '#e9f5f9', flex: 1, alignItems: 'center' }}>
             {/* User Info Section */}
-            <UserInfoCard user={user} dynamicStyles={dynamicStyles} />
+            <PersonInfo user={user} dynamicStyles={dynamicStyles} />
 
             {/* Address Section */}
             <Address

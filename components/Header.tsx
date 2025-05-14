@@ -26,10 +26,10 @@ export default function Header({
     return (
         <View style={[styles.header, dynamicStyles.header]}>
             {onBack && (
-                <TouchableOpacity onPress={onBack} style={{ marginLeft: "1%" }}>
+                <TouchableOpacity onPress={onBack} style={{ marginLeft: "5%" }}>
                     <MaterialIcons
                         name={backIconName}
-                        size={28}
+                        size={30}
                         color={isDarkMode ? "#FFFFFF" : "#000"}
                     />
                 </TouchableOpacity>
@@ -41,10 +41,10 @@ export default function Header({
                 )}
             </Text>
             {onToggleTheme && (
-                <TouchableOpacity onPress={onToggleTheme} style={{ marginRight: "1%" }}>
+                <TouchableOpacity onPress={onToggleTheme} style={{ marginRight: "5%" }}>
                     <MaterialIcons
                         name={isDarkMode ? "wb-sunny" : "dark-mode"}
-                        size={24}
+                        size={30}
                         color={isDarkMode ? "#FFD700" : "black"}
                     />
                 </TouchableOpacity>

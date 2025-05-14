@@ -142,7 +142,7 @@ export default function HomeScreen() {
           <TouchableOpacity style={styles.darkModeButton} onPress={toggleTheme}>
             <MaterialIcons
               name={isDarkMode ? 'wb-sunny' : 'dark-mode'}
-              size={24}
+              size={30}
               color={isDarkMode ? '#FFD700' : 'black'}
             />
           </TouchableOpacity>
