@@ -34,7 +34,7 @@ export default function Header({
                     />
                 </TouchableOpacity>
             )}
-            <Text style={[dynamicStyles.text, { fontWeight: "bold", fontSize: 25 }]}>
+            <Text style={[dynamicStyles.text, { fontWeight: "bold", fontSize: 30 }]}>
                 {title}
                 {count > 0 && (
                     <Text style={{ fontSize: 12 }}> ({count})</Text>
