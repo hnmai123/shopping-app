@@ -1,12 +1,13 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as ImagePicker from 'expo-image-picker';
 import { collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
 import filter from 'lodash.filter';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, Image, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Dimensions, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import ProductCard from '../../components/ProductCard';
+import SearchBar from '../../components/SearchBar';
 import { useCart } from '../../context/CartContext';
 import { useTheme } from '../../context/ThemeContext';
 import { auth, db } from '../../firebase/firebaseConfig';
@@ -269,22 +270,13 @@ export default function HomeScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={[styles.container, dynamicStyles.container]}>
         <View style={[styles.header, dynamicStyles.header]}>
-          <View style={[styles.searchContainer, dynamicStyles.searchContainer]}>
-            <Ionicons name="search" size={24} color={isDarkMode ? '#FFFFFF' : 'black'} style={{ marginRight: 10 }} />
-            <TextInput
-              placeholder="Search ..."
-              placeholderTextColor={isDarkMode ? '#BBBBBB' : '#666666'}
-              clearButtonMode="always"
-              style={[styles.searchBox, dynamicStyles.searchText]}
-              autoCapitalize="none"
-              autoCorrect={false}
-              value={searchQuery}
-              onChangeText={(query) => handleSearch(query)}
-            />
-            <TouchableOpacity onPress={handleCameraSearch}>
-              <Ionicons name="camera-outline" size={24} color={isDarkMode ? '#FFFFFF' : 'black'} />
-            </TouchableOpacity>
-          </View>
+          <SearchBar
+            searchQuery={searchQuery}
+            onChangeText={handleSearch}
+            onCameraPress={handleCameraSearch}
+            dynamicStyles={dynamicStyles}
+            isDarkMode={isDarkMode}
+          />
           <TouchableOpacity style={styles.darkModeButton} onPress={toggleTheme}>
             <MaterialIcons
               name={isDarkMode ? 'wb-sunny' : 'dark-mode'}
@@ -298,13 +290,12 @@ export default function HomeScreen() {
           data={data}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <TouchableOpacity style={[styles.productCard, dynamicStyles.productCard]} onPress={() => addtoCart(item)}>
-              <Image source={{ uri: item.image }} style={styles.productImage} />
-              <View style={[styles.textContainer, dynamicStyles.textContainer]}>
-                <Text style={[dynamicStyles.text, { fontSize: 12, paddingBottom: 15 }]}>{item.name}</Text>
-                <Text style={[dynamicStyles.text, { fontSize: 10 }]}>{formatter.format(item.price)}</Text>
-              </View>
-            </TouchableOpacity>
+            <ProductCard
+              item={item}
+              onPress={() => addtoCart(item)}
+              dynamicStyles={dynamicStyles}
+              formatter={formatter}
+            />
           )}
           numColumns={2}
           contentContainerStyle={[styles.productList, dynamicStyles.productList]}

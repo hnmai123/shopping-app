@@ -1,15 +1,12 @@
-import { DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { AddressProvider } from '@/context/AddressContext';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'react-native-reanimated';
-import { useState } from 'react';
 import { CartProvider } from '../context/CartContext';
-import React from 'react';
 import { ThemeProvider } from '../context/ThemeContext';
-import { AddressProvider } from '@/context/AddressContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,7 +36,6 @@ export default function RootLayout() {
             ) : (
               <Stack.Screen name="(auth)" />
             )}
-            <Stack.Screen name="+not-found" />
           </Stack>
           <StatusBar style="auto" />
         </AddressProvider>
