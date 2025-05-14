@@ -1,8 +1,8 @@
+import Header from '@/components/Header';
 import MapComponent from '@/components/Map';
 import { useAddress } from '@/context/AddressContext';
 import { useTheme } from '@/context/ThemeContext';
 import { auth, db } from '@/firebase/firebaseConfig';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -16,8 +16,6 @@ export default function MapPicker() {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
   const { isDarkMode, toggleTheme } = useTheme();
-
-//   const { onLocationSelected } = route.params as MapPickerRouteParams;
 
   useEffect(() => {
     (async () => {
@@ -62,7 +60,7 @@ export default function MapPicker() {
           address,
           coords: location,
         });
-      }      
+      }
       navigation.goBack();
     }
   };
@@ -78,15 +76,16 @@ export default function MapPicker() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: isDarkMode ? '#121212' : '#ffffff' }}>
-      <View style={[styles.header, { backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF' }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <MaterialIcons name="arrow-back" size={28} color={isDarkMode ? 'white' : 'black'} />
-        </TouchableOpacity>
-        <Text style={[styles.headerText, { color: isDarkMode ? 'white' : 'black' }]}>Pick a Location</Text>
-        <TouchableOpacity onPress={toggleTheme}>
-          <MaterialIcons name={isDarkMode ? 'wb-sunny' : 'dark-mode'} size={24} color={isDarkMode ? '#FFD700' : 'black'} />
-        </TouchableOpacity>
-      </View>
+      <Header
+        title="Pick a Location"
+        onBack={() => navigation.goBack()}
+        onToggleTheme={toggleTheme}
+        isDarkMode={isDarkMode}
+        dynamicStyles={{
+          header: { backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF' },
+          text: { color: isDarkMode ? 'white' : 'black' }
+        }}
+      />
 
       <MapComponent
         initialLocation={location}
@@ -111,13 +110,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  header: {
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
   },
   headerText: {
     fontSize: 18,

@@ -1,25 +1,21 @@
 // Account.tsx (Fixed version)
-import MapComponent from '@/components/Map';
+import Address from '@/components/account/Address';
+import Payment from '@/components/account/Payment';
+import UserInfoCard from '@/components/account/PersonInfo';
+import Support from '@/components/account/Support';
+import Header from '@/components/Header';
 import { useAddress } from '@/context/AddressContext';
 import { useCart } from '@/context/CartContext';
 import { auth, db } from '@/firebase/firebaseConfig';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import Fontisto from '@expo/vector-icons/Fontisto';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from "react";
 import {
-  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useTheme } from '../../../context/ThemeContext';
@@ -171,130 +167,32 @@ export default function Account() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={[styles.container, dynamicStyles.container]}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: 50 }}>
-          <View style={[styles.header, dynamicStyles.header]}>
-            <TouchableOpacity style={{ marginLeft: "7%" }} onPress={() => navigation.navigate('(supplier)' as never)}>
-              <MaterialCommunityIcons name="store-edit-outline" size={30} color={dynamicStyles.text.color} />
-            </TouchableOpacity>
-            <Text style={[{ fontSize: 40, fontWeight: 'bold' }, dynamicStyles.text]}>Account</Text>
-            <TouchableOpacity style={{ marginRight: "7%" }} onPress={toggleTheme}>
-              <MaterialIcons
-                name={isDarkMode ? 'wb-sunny' : 'dark-mode'}
-                size={24}
-                color={isDarkMode ? '#FFD700' : 'black'}
-              />
-            </TouchableOpacity>
-          </View>
+          <Header
+            title="Account"
+            onBack={() => navigation.navigate('(supplier)' as never)}
+            onToggleTheme={toggleTheme}
+            isDarkMode={isDarkMode}
+            dynamicStyles={dynamicStyles}
+            backIconName='store'
+          />
 
           <View style={{ backgroundColor: isDarkMode ? '#121212' : '#e9f5f9', flex: 1, alignItems: 'center' }}>
-            <View style={dynamicStyles.card}>
-              <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-                <Image
-                  source={require('@/assets/images/Acount.png')}
-                  style={{ width: 50, height: 50, borderRadius: 50 }}
-                />
-                <Text style={dynamicStyles.text}>{user?.nickname || "Nickname"}</Text>
-              </View>
-              <View style={{ flex: 1, marginLeft: 20 }}>
-                <Text style={dynamicStyles.text}>{user?.name || "Name"}</Text>
-                <Text style={dynamicStyles.text}>Your Point</Text>
-                <Text style={dynamicStyles.text}>{user?.email || "Email"}</Text>
-              </View>
-            </View>
+            {/* User Info Section */}
+            <UserInfoCard user={user} dynamicStyles={dynamicStyles} />
 
             {/* Address Section */}
-            <View style={dynamicStyles.addressCard}>
-              <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-                <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Billing & Shipping Address</Text>
-              </View>
+            <Address
+              dynamicStyles={dynamicStyles}
+              isDarkMode={isDarkMode}
+              coords={coords}
+              address={address}
+              navigation={navigation}
+              handleCurrentLocation={handleCurrentLocation}
+            />
 
-              <View style={dynamicStyles.divider} />
+            <Payment dynamicStyles={dynamicStyles} />
 
-              <View style={{ flexDirection: 'row', alignItems: 'flex-start', paddingTop: 5 }}>
-                <TouchableOpacity style={{ width: '50%', marginRight: 10}} onPress={() => navigation.navigate('map' as never)}>
-                  <MapComponent initialLocation={coords} selectable={false} height={150} />
-                </TouchableOpacity>
-                <View style={{ flex: 1, margin: 5, gap: 10 }}>
-                  <Text style={dynamicStyles.text}>{address || "Address"}</Text>
-                  <TouchableOpacity onPress={handleCurrentLocation}>
-                    <Text style={[{ color: isDarkMode ? '#66B2FF' : '#007AFF' }]}>Using your location</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => navigation.navigate('map' as never)}>
-                    <Text style={dynamicStyles.text}>Change {">"}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-
-            <View style={dynamicStyles.paymentCard}>
-              <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-                <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Payment Information</Text>
-              </View>
-              <View style={dynamicStyles.divider} />
-
-              <View style={dynamicStyles.paymentRow}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                  <Text style={dynamicStyles.text}>Credit cards</Text>
-                  <Fontisto name="visa" size={24} color={dynamicStyles.text.color} />
-                  <Fontisto name="mastercard" size={24} color={dynamicStyles.text.color} />
-                  <Fontisto name="american-express" size={24} color={dynamicStyles.text.color} />
-                </View>
-                <TouchableOpacity>
-                  <Text style={dynamicStyles.text}>**** 1234</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={dynamicStyles.divider} />
-
-              <View style={dynamicStyles.paymentRow}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                  <Text style={dynamicStyles.text}>E-wallet</Text>
-                  <Fontisto name="apple-pay" size={24} color={dynamicStyles.text.color} />
-                  <FontAwesome6 name="google-pay" size={24} color={dynamicStyles.text.color} />
-                  <Fontisto name="paypal" size={24} color={dynamicStyles.text.color} />
-                </View>
-                <TouchableOpacity>
-                  <Text style={dynamicStyles.text}>Enter {">"}</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={dynamicStyles.divider} />
-
-              <View style={dynamicStyles.paymentRow}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
-                  <Ionicons name="wallet-outline" size={24} color={dynamicStyles.text.color} />
-                  <Text style={dynamicStyles.text}>Your balance: </Text>
-                </View>
-                <Text style={dynamicStyles.text}>$100</Text>
-              </View>
-            </View>
-
-            {/* Support Section */}
-            <View style={dynamicStyles.supportCard}>
-              <View style={{ backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF', padding: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-                <Text style={[dynamicStyles.text, { fontWeight: 'bold', fontSize: 16 }]}>Support</Text>
-              </View>
-
-              <View style={dynamicStyles.divider} />
-
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
-                <MaterialIcons name="report-gmailerrorred" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
-                <Text style={dynamicStyles.text}>Contact us</Text>
-              </TouchableOpacity>
-
-              <View style={dynamicStyles.divider} />
-
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }}>
-                <Ionicons name="settings-outline" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
-                <Text style={dynamicStyles.text}>Setting</Text>
-              </TouchableOpacity>
-
-              <View style={dynamicStyles.divider} />
-
-              <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', padding: 10 }} onPress={handleLogout}>
-                <MaterialIcons name="logout" size={24} color={dynamicStyles.text.color} style={{ marginRight: 10 }} />
-                <Text style={dynamicStyles.text}>Log out</Text>
-              </TouchableOpacity>
-            </View>
+            <Support dynamicStyles={dynamicStyles} handleLogout={handleLogout} />
           </View>
         </ScrollView>
       </SafeAreaView>
