@@ -1,3 +1,4 @@
+import { styles } from '@/styles/LoginScreenStyles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -9,7 +10,6 @@ import {
   Platform,
   SafeAreaView,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
@@ -19,32 +19,45 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { auth } from '../../firebase/firebaseConfig';
 
+function PasswordInput({ value, onChangeText, showPassword, setShowPassword, isDarkMode, dynamicStyles }: any) {
+  return (
+    <View style={[styles.passwordContainer, dynamicStyles.input]}>
+      <TextInput
+        placeholder="Password"
+        placeholderTextColor={dynamicStyles.placeholderText.color}
+        secureTextEntry={!showPassword}
+        value={value}
+        autoCapitalize="none"
+        autoCorrect={false}
+        onChangeText={onChangeText}
+        style={{ flex: 0.95, fontSize: 15, color: dynamicStyles.text.color }}
+      />
+      <TouchableOpacity onPress={() => setShowPassword((prev: boolean) => !prev)}>
+        <MaterialIcons
+          name={!showPassword ? 'visibility-off' : 'visibility'}
+          size={25}
+          color={isDarkMode ? '#FFFFFF' : '#666666'}
+        />
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
-  const { theme, toggleTheme, isDarkMode } = useTheme();
+  const { toggleTheme, isDarkMode } = useTheme();
 
-  const handleLogin = async () => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("Login successful");
-      router.replace('/(tabs)');
-    } catch (err) {
-      setErrorMessage("Sorry, your password or email was incorrect.");
-    }
-  };
-
-  const dynamicStyles = StyleSheet.create({
+  const dynamicStyles = {
     container: {
-      flex: 1,
       backgroundColor: isDarkMode ? '#121212' : '#e9f5f9',
     },
     header: {
       backgroundColor: isDarkMode ? '#1E1E1E' : '#61EDFF',
-      padding: "6%",
+      padding: 24,
     },
     text: {
       color: isDarkMode ? '#FFFFFF' : 'black',
@@ -59,7 +72,16 @@ export default function LoginScreen() {
     placeholderText: {
       color: '#989898',
     },
-  });
+  };
+
+  const handleLogin = async () => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      router.replace('/(tabs)');
+    } catch (err) {
+      setErrorMessage("Sorry, your password or email was incorrect.");
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -93,25 +115,14 @@ export default function LoginScreen() {
                   autoCorrect={false}
                   onChangeText={setEmail}
                 />
-                <View style={[styles.passwordContainer, dynamicStyles.input]}>
-                  <TextInput
-                    placeholder="Password"
-                    placeholderTextColor={dynamicStyles.placeholderText.color}
-                    secureTextEntry={!showPassword}
-                    value={password}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    onChangeText={setPassword}
-                    style={{ flex: 0.95, fontSize: 15, color: dynamicStyles.text.color }}
-                  />
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                    <MaterialIcons
-                      name={!showPassword ? 'visibility-off' : 'visibility'}
-                      size={25}
-                      color={isDarkMode ? '#FFFFFF' : '#666666'}
-                    />
-                  </TouchableOpacity>
-                </View>
+                <PasswordInput
+                  value={password}
+                  onChangeText={setPassword}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                  isDarkMode={isDarkMode}
+                  dynamicStyles={dynamicStyles}
+                />
                 <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
                   <Text style={styles.loginButtonText}>Log in</Text>
                 </TouchableOpacity>
@@ -140,96 +151,3 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  mainContainer: {
-    flex: 1,
-  },
-  header: {
-    padding: '6%',
-  },
-  appName: {
-    fontSize: 50,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 50,
-  },
-  appTarget: {
-    fontSize: 30,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  logo: {
-    width: 131,
-    height: 131,
-    alignSelf: 'center',
-    marginTop: 50,
-    marginBottom: 20,
-  },
-  loginContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  welcomeBack: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  loginField: {
-    borderRadius: 10,
-    width: '78%',
-    marginBottom: 10,
-    height: 45,
-    alignSelf: 'center',
-    paddingLeft: 10,
-    fontSize: 15,
-  },
-  passwordContainer: {
-    width: '78%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 45,
-    borderRadius: 10,
-    alignSelf: 'center',
-    paddingLeft: 10,
-    marginBottom: 10,
-  },
-  loginButton: {
-    width: '78%',
-    backgroundColor: '#00B1BA',
-    height: 45,
-    borderRadius: 10,
-    alignSelf: 'center',
-    justifyContent: 'center',
-  },
-  loginButtonText: {
-    fontSize: 15,
-    fontWeight: 'bold',
-    color: 'black',
-    textAlign: 'center',
-  },
-  optionRows: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '78%',
-    alignSelf: 'center',
-  },
-  optionText: {
-    fontSize: 10,
-    padding: 5,
-    marginBottom: 5,
-  },
-  signUpText: {
-    fontSize: 12,
-    textAlign: 'center',
-  },
-  signUpLink: {
-    fontSize: 12,
-  },
-});
