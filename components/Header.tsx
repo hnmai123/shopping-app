@@ -11,6 +11,7 @@ interface HeaderProps {
     isDarkMode?: boolean;
     dynamicStyles?: any;
     backIconName?: keyof typeof MaterialIcons.glyphMap;
+    count?: number;
 }
 
 export default function Header({
@@ -20,6 +21,7 @@ export default function Header({
     isDarkMode = false,
     dynamicStyles = {},
     backIconName = "arrow-back",
+    count = 0,
 }: HeaderProps) {
     return (
         <View style={[styles.header, dynamicStyles.header]}>
@@ -34,6 +36,9 @@ export default function Header({
             )}
             <Text style={[dynamicStyles.text, { fontWeight: "bold", fontSize: 25 }]}>
                 {title}
+                {count > 0 && (
+                    <Text style={{ fontSize: 12 }}> ({count})</Text>
+                )}
             </Text>
             {onToggleTheme && (
                 <TouchableOpacity onPress={onToggleTheme} style={{ marginRight: "1%" }}>
