@@ -2,6 +2,9 @@ import { fireEvent, render } from '@testing-library/react-native';
 import React from 'react';
 import AddProduct from '../../app/(tabs)/(profile)/(supplier)/addProduct';
 
+
+const mockHandleAddProduct = jest.fn();
+
 jest.mock('expo-router', () => ({
   useNavigation: () => ({ goBack: jest.fn() }),
 }));
@@ -16,7 +19,7 @@ jest.mock('@/hooks/useProductForm', () => ({
     takePhoto: jest.fn(),
     uploadProgress: 0,
     uploading: false,
-    handleAddProduct: jest.fn(),
+    handleAddProduct: mockHandleAddProduct,
   }),
 }));
 
@@ -39,7 +42,7 @@ jest.mock('@/components/supplier/ProductForm', () => {
 });
 
 describe('AddProduct screen', () => {
-  it('renders and allows product input and submission', () => {
+  it('UI test for AddProduct: renders and allows product input and submission', () => {
     const { getByTestId, getByText } = render(<AddProduct />);
     const input = getByTestId('product-name-input');
 
@@ -48,5 +51,7 @@ describe('AddProduct screen', () => {
 
     const button = getByText('Add Product');
     fireEvent.press(button);
+    expect(mockHandleAddProduct).toHaveBeenCalled();
   });
+  
 });

@@ -54,3 +54,7 @@ export const addToCart = async (
     }
   });
 };
+
+export function getTotal(cart: { price: number; quantity: number }[]): number {
+  return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+} 

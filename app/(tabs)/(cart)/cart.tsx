@@ -11,6 +11,7 @@ import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useCart } from '../../../context/CartContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { styles } from '../../../styles/CartScreenStyles';
+import { getTotal } from '@/utils/cartUtils';
 
 export default function Cart() {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -73,7 +74,7 @@ export default function Cart() {
         await deleteItemFromFirestore(item.id);
     };
 
-    const totalAmount = cart.reduce((total: number, item: any) => total + item.price * item.quantity, 0);
+    const totalAmount = getTotal(cart);
 
     const dynamicStyles = StyleSheet.create({
         container: {
