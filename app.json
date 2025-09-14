@@ -24,7 +24,8 @@
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION"
-      ]
+      ],
+      "package": "com.hnmai1.shoppingapp"
     },
     "web": {
       "bundler": "metro",
@@ -47,6 +48,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "92df4541-51b1-48e8-8d52-1351dcc074af"
+      }
     }
   }
 }
