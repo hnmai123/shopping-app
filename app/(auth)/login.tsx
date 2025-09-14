@@ -78,6 +78,7 @@ export default function LoginScreen() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.replace('/(tabs)');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setErrorMessage("Sorry, your password or email was incorrect.");
     }
