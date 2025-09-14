@@ -1,50 +1,120 @@
-# Welcome to your Expo app 👋
+# Shopping App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An Expo + Firebase shopping app built using React Native / Expo Router.  
+Includes authentication, Firestore, storage, and environment-based configuration.
 
-## Get started
+---
 
-1. Install dependencies
+## 📦 Features
 
+- Firebase authentication
+- Firestore for product/cart data
+- Storage for uploads/images
+- Environment-based config (using Expo‑public env vars)
+- File-based routing with **expo-router**
+- TypeScript support
+- Cross-platform: iOS / Android / Web
+
+---
+
+## 🚀 Getting Started
+
+These steps will get you a copy of the project up and running on your local machine.
+
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- npm or yarn
+- Expo CLI (`npm install -g expo-cli`)
+- Firebase project & credentials
+- Expo Go: SDK 53
+
+### Setup
+
+1. Clone this repo  
+   ```bash
+   git clone https://github.com/hnmai123/shopping-app.git
+   cd shopping-app
+   ```
+
+2. Install dependencies  
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Create an `.env.local` file in the project root with your Firebase configuration. It should look like:
 
-   ```bash
-   npx expo start
+   ```env
+   EXPO_PUBLIC_FIREBASE_API_KEY=YOUR_FULL_API_KEY_HERE
+   EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your-app.firebaseapp.com
+   EXPO_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+   EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your-app.appspot.com
+   EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=YOUR_SENDER_ID
+   EXPO_PUBLIC_FIREBASE_APP_ID=YOUR_APP_ID
+   EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=YOUR_MEASUREMENT_ID
    ```
 
-In the output, you'll find options to open the app in a
+4. Start the app  
+   ```bash
+   npx expo start --clear
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+5. Open in simulator / device / web  
+   - Press `i` for iOS simulator  
+   - Press `a` for Android emulator  
+   - Scan QR code with Expo Go  
+   - Press `w` for web preview
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+---
 
-## Get a fresh project
+## 🧰 Folder Structure
 
-When you're ready, run:
+Here’s a quick overview of important directories:
 
-```bash
-npm run reset-project
+```
+/
+├ firebase/           # Firebase initialization and config
+├ app/                # Expo Router routes
+├ components/         # Reusable UI components
+├ hooks/              # Custom React hooks
+├ utils/              # Utility functions
+├ styles/             # Styles/themes
+├ assets/             # Images, icons, splash etc.
+├ tsconfig.json       # TypeScript configuration
+├ babel.config.js     # Babel settings & aliasing
+└ app.json            # Project and Expo configuration
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## ✔ Common Tasks
 
-To learn more about developing your project with Expo, look at the following resources:
+| Task | Command |
+|------|---------|
+| Run app (dev) | `npx expo start --clear` |
+| Build web version | `npm run web` or `expo export:web` |
+| Build production native apps | Use Expo EAS or appropriate build workflow |
+| Lint & format | Add your `lint` or `prettier` scripts if configured |
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## 🔑 Environment variables
 
-Join our community of developers creating universal apps.
+Make sure all required `EXPO_PUBLIC_FIREBASE_*` vars are set. If any are missing or invalid, Firebase initialization will fail (e.g., “Invalid API key”).
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## 🤝 Contributing
+
+1. Fork the repository  
+2. Create your feature branch (`git checkout -b feature/your-feature`)  
+3. Commit your changes (`git commit -m "feat: add XYZ"`)  
+4. Push to your fork (`git push origin feature/your-feature`)  
+5. Open a Pull Request
+
+---
+
+## 📜 License & Acknowledgments
+
+- This project is developed as a demo / student project.  
+- Firebase and Expo are used under their respective licenses.
